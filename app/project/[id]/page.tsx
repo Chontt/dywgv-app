@@ -87,7 +87,6 @@ export default function ProjectDetailPage({
 
       const { error } = await supabase
         .from("content_projects")
-        // @ts-expect-error - suppress Supabase typing mismatch
         .update({
           output_text: editableText,
         } as any)

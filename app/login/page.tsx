@@ -61,7 +61,7 @@ export default function LoginPage() {
 
           <div className="text-center mb-8">
             <h1 className="font-heading text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              ContentBuddyAI
+              PROMPTY
             </h1>
             <p className="text-slate-500 mt-2 text-sm">
               {t('auth_login_subtitle')}

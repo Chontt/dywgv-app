@@ -32,7 +32,7 @@ const notoSansKR = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "ContentBuddyAI",
+  title: "PROMPTY",
   description: "AI Social Content & Planning Studio",
 };
 

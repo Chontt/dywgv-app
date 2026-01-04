@@ -167,7 +167,7 @@ export default function SettingsPage() {
                                         const url = URL.createObjectURL(blob);
                                         const a = document.createElement('a');
                                         a.href = url;
-                                        a.download = `contentbuddy-data-export-${new Date().toISOString().split('T')[0]}.json`;
+                                        a.download = `prompty-data-export-${new Date().toISOString().split('T')[0]}.json`;
                                         a.click();
                                     }}
                                     className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors text-sm"

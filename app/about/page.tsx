@@ -2,9 +2,9 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="text-2xl font-bold mb-2">About ContentBuddyAI</h1>
+        <h1 className="text-2xl font-bold mb-2">About PROMPTY</h1>
         <p className="text-sm text-slate-600 mb-4">
-          ContentBuddyAI is an AI-powered studio for planning and generating
+          PROMPTY is an AI-powered studio for planning and generating
           social media content across multiple platforms.
         </p>
         <p className="text-sm text-slate-600">

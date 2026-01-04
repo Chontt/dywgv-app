@@ -65,8 +65,8 @@ export default function SideNav({ userEmail, activeProfile, isPro }: SideNavProp
             {/* Mobile Header (Fixed) */}
             <div className={`lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 z-40 flex items-center justify-between px-6 transition-all ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                 <Link href="/" className="flex items-center gap-2">
-                    <img src="/logo.png" alt="ContentBuddy" className="w-8 h-8 object-contain" />
-                    <span className="font-heading font-bold text-xl text-slate-900">ContentBuddy</span>
+                    <img src="/logo.png" alt="PROMPTY" className="w-8 h-8 object-contain" />
+                    <span className="font-heading font-bold text-xl text-slate-900">PROMPTY</span>
                 </Link>
                 <button
                     onClick={() => setIsOpen(true)}
@@ -96,8 +96,8 @@ export default function SideNav({ userEmail, activeProfile, isPro }: SideNavProp
                         >
                             <div className="p-6 flex items-center justify-between border-b border-slate-100">
                                 <Link href="/" className="flex items-center gap-2">
-                                    <img src="/logo.png" alt="ContentBuddy" className="w-8 h-8 object-contain" />
-                                    <span className="font-heading font-bold text-xl text-slate-900">ContentBuddy</span>
+                                    <img src="/logo.png" alt="PROMPTY" className="w-8 h-8 object-contain" />
+                                    <span className="font-heading font-bold text-xl text-slate-900">PROMPTY</span>
                                 </Link>
                                 <button
                                     onClick={() => setIsOpen(false)}
@@ -126,8 +126,8 @@ export default function SideNav({ userEmail, activeProfile, isPro }: SideNavProp
             <aside className="w-64 bg-slate-50/50 border-r border-slate-200 hidden lg:flex flex-col h-screen fixed left-0 top-0 overflow-y-auto custom-scrollbar">
                 <div className="p-8 pb-4">
                     <Link href="/" className="flex items-center gap-2 text-indigo-600 hover:opacity-80 transition-opacity">
-                        <img src="/logo.png" alt="ContentBuddy" className="w-8 h-8 object-contain" />
-                        <span className="font-heading font-bold text-xl tracking-tight text-slate-900">ContentBuddy</span>
+                        <img src="/logo.png" alt="PROMPTY" className="w-8 h-8 object-contain" />
+                        <span className="font-heading font-bold text-xl tracking-tight text-slate-900">PROMPTY</span>
                     </Link>
                 </div>
                 <div className="flex-1 flex flex-col">

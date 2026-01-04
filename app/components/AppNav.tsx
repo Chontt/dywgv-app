@@ -83,12 +83,12 @@ export default function AppNav() {
           <Link href="/" className="flex items-center gap-2 group">
             <Image
               src="/logo.png"
-              alt="ContentBuddy Logo"
+              alt="PROMPTY Logo"
               width={32}
               height={32}
               className="object-contain"
             />
-            <span className="font-heading font-bold text-slate-900 tracking-tight text-lg">ContentBuddy</span>
+            <span className="font-heading font-bold text-slate-900 tracking-tight text-lg">PROMPTY</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             {user && (

@@ -391,7 +391,7 @@ export default function HelpPage() {
                                             “Small daily actions compound into authority.”
                                         </p>
                                         <p className="text-sm opacity-60 relative z-10">
-                                            ContentBuddy is built to streamline your strategic thinking, not just write posts. Focus on the leverage.
+                                            PROMPTY is built to streamline your strategic thinking, not just write posts. Focus on the leverage.
                                         </p>
                                     </div>
                                 </section>
