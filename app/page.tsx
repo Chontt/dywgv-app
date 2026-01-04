@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import StartGenerateButton from "./components/StartGenerateButton";
-import LanguageSwitcher from "./components/LanguageSwitcher";
+// LanguageSwitcher removed (unused in this file)
 import { useI18n } from "@/lib/i18n";
 
 function Hero() {
@@ -169,7 +169,7 @@ function HowItWorks() {
 
           <div className="text-center mt-12">
             <p className="text-lg font-heading font-bold text-indigo-900/80 italic">
-              "{t('hiw_closing')}"
+              “{t('hiw_closing')}”
             </p>
           </div>
         </div>

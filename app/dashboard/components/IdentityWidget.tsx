@@ -43,7 +43,7 @@ export default function IdentityWidget({ profiles, activeProfileId }: IdentityWi
 
             <div className="bg-slate-900 rounded-xl p-4 text-white">
                 <p className="text-sm font-medium leading-relaxed">
-                    "{t('dash_id_copy')}"
+                    &quot;{t('dash_id_copy')}&quot;
                 </p>
             </div>
 

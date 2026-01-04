@@ -17,6 +17,11 @@ export async function POST(req: Request) {
     let event;
 
     try {
+        if (!stripe) {
+            console.error('Stripe client not configured. STRIPE_SECRET_KEY missing.');
+            return new NextResponse('Stripe not configured', { status: 500 });
+        }
+
         event = stripe.webhooks.constructEvent(
             body,
             signature,

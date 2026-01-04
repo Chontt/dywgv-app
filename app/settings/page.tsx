@@ -58,11 +58,6 @@ export default function SettingsPage() {
                 .update({ language: lang } as any)
                 .eq("id", activeProfile.id);
 
-            // Force reload to apply font/lang updates immediately via LanguageProvider
-            document.documentElement.lang = lang;
-            document.documentElement.classList.remove("lang-th", "lang-jp", "lang-ko", "lang-en");
-            document.documentElement.classList.add(`lang-${lang}`);
-
             // Update local state to reflect change
             setActiveProfile({ ...activeProfile, language: lang });
         }

@@ -28,8 +28,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("en");
   const [mounted, setMounted] = useState(false);
 
+  function updateHtmlLang(newLang: Lang) {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = newLang;
+      document.documentElement.classList.remove('lang-en', 'lang-th', 'lang-ja', 'lang-ko');
+      document.documentElement.classList.add(`lang-${newLang}`);
+    }
+  }
+
   useEffect(() => {
-    setMounted(true);
     const initLang = async () => {
       // 1. Try local storage first (fastest)
       const saved = localStorage.getItem("app_lang") as Lang;
@@ -59,16 +66,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         }
       }
     };
-    initLang();
+    initLang().then(() => setMounted(true));
   }, []);
 
-  const updateHtmlLang = (newLang: Lang) => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.lang = newLang;
-      document.documentElement.classList.remove('lang-en', 'lang-th', 'lang-ja', 'lang-ko');
-      document.documentElement.classList.add(`lang-${newLang}`);
-    }
-  };
+  
 
   const setLocale = async (newLang: Lang) => {
     setLangState(newLang);

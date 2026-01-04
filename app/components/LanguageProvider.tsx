@@ -7,8 +7,6 @@ export default function LanguageProvider({ children }: { children: React.ReactNo
     const [hydrated, setHydrated] = useState(false);
 
     useEffect(() => {
-        setHydrated(true);
-
         const syncLanguage = async () => {
             try {
                 // 1. Check if we have a user
@@ -54,7 +52,11 @@ export default function LanguageProvider({ children }: { children: React.ReactNo
             }
         };
 
-        syncLanguage();
+        // Run sync and then mark hydrated to avoid synchronous setState in effect body
+        (async () => {
+            await syncLanguage();
+            setHydrated(true);
+        })();
 
         // Listen for profile changes (optional, but good for reactivity)
         // For now, simpler is better. We assume page refresh on language change or just re-mounting.

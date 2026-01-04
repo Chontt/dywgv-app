@@ -50,7 +50,12 @@ export function createClient(cookieStoreOrGetter: CookieStore | (() => CookieSto
                                 cookieStore.set({ name, value, ...options });
                             } catch (e) {
                                 // fallback to positional args if supported
-                                (cookieStore.set as Function)(name, value);
+                                const setter = cookieStore.set as unknown as ((a: any, b?: any) => void);
+                                try {
+                                    setter(name, value);
+                                } catch (err) {
+                                    // ignore
+                                }
                             }
                         }
                     } catch (error) {

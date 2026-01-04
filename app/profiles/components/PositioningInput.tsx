@@ -30,7 +30,7 @@ export default function PositioningInput({ profile, onChange }: PositioningInput
                     </label>
                     <div className="relative">
                         <span className="absolute left-4 top-3.5 text-slate-400 font-medium select-none">
-                            "{t('positioning_prefix')}"
+                            &quot;{t('positioning_prefix')}&quot;
                         </span>
                         <input
                             type="text"

@@ -52,7 +52,7 @@ export default function MomentumWidget({ hookCount, outlineCount }: MomentumWidg
 
             <div className="bg-indigo-50 rounded-xl p-3 border border-indigo-100">
                 <p className="text-xs text-indigo-800 font-medium text-center">
-                    "{t('dash_momentum_copy')}"
+                    &quot;{t('dash_momentum_copy')}&quot;
                 </p>
                 <p className="text-[10px] text-indigo-400 text-center mt-1">
                     {t('dash_momentum_pain')}

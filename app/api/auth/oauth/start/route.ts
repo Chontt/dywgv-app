@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || '';
     const redirectTo = `${origin}/api/auth/oauth/callback`;
 
-    const supabase = createClient(cookies());
+    const supabase = createClient(await cookies());
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,

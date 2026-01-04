@@ -7,7 +7,7 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const code = url.searchParams.get('code');
 
-    const supabase = createClient(cookies());
+    const supabase = createClient(await cookies());
 
     if (code) {
       // Exchange the auth code for a session; this will let the SDK set cookies

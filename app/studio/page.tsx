@@ -163,7 +163,7 @@ function StudioContent() {
               setActiveProfileId(p.profile_id);
               await loadProfile(p.profile_id);
             }
-            // @ts-ignore
+            // @ts-expect-error - suppress Supabase typing mismatch
             await supabase.from("content_projects").update({ last_opened_at: new Date().toISOString() } as any).eq("id", qProjectId);
           }
         }
@@ -353,14 +353,14 @@ function StudioContent() {
 
     if (currentProjectId) {
       // UPDATE
-      // @ts-ignore
+      // @ts-expect-error - suppress Supabase typing mismatch
       await supabase.from("content_projects").update(payload as any).eq("id", currentProjectId);
       if (status === "completed") {
         alert(t('studio_msg_completed') || "Project Completed!");
         router.push("/dashboard"); // Return to dashboard on completion for closure
       }
     } else {
-      // @ts-ignore
+      // @ts-expect-error - suppress Supabase typing mismatch
       // INSERT
       const { data, error } = await supabase.from("content_projects").insert(payload as any).select().single() as any;
       if (error) {

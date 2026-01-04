@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'email and password required' }, { status: 400 });
     }
 
-    const supabase = createClient(cookies());
+    const supabase = createClient(await cookies());
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 

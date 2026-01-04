@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 
 export async function POST() {
   try {
-    const supabase = createClient(cookies());
+    const supabase = createClient(await cookies());
 
     // Server-side sign out will clear auth cookies
     await supabase.auth.signOut();
