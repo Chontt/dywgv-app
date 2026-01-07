@@ -1,0 +1,175 @@
+"use client";
+
+import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
+import { Shield, Zap, Sparkles, ChevronRight, Files, UserCircle, LayoutDashboard, Mail } from "lucide-react";
+import AppNav from "./components/AppNav";
+
+export default function HomePage() {
+  const { t } = useI18n();
+
+  return (
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-background transition-colors duration-500 overflow-x-hidden">
+      <AppNav />
+
+      <main className="relative">
+        {/* Background Atmosphere */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-[20%] right-0 w-[500px] h-[500px] bg-secondary/10 blur-[100px] rounded-full pointer-events-none" />
+
+        {/* Hero Section */}
+        <section className="relative pt-20 pb-32 lg:pt-32 lg:pb-56 px-8">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+            
+            <div className="space-y-12 animate-in fade-in slide-in-from-left-12 duration-1000">
+              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.4em]">
+                <Zap className="w-3 h-3" /> System Phase: Intelligence
+              </div>
+              
+              <h1 className="text-7xl lg:text-[110px] font-heading font-black tracking-tighter leading-[0.85] text-foreground">
+                Build <span className="text-gradient">Belief</span> <br /> 
+                That Converts.
+              </h1>
+              
+              <p className="max-w-xl text-xl lg:text-2xl text-muted font-medium leading-relaxed opacity-80">
+                {t('hero_subtitle')}
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-6 pt-6">
+                <Link
+                  href="/studio"
+                  className="group relative px-12 py-6 bg-primary text-background rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] shadow-neon-glow hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <Sparkles className="w-4 h-4" /> {t('cta_primary')}
+                </Link>
+                <Link
+                  href="/plans"
+                  className="px-12 py-6 bg-foreground/5 border border-foreground/10 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] text-foreground hover:bg-foreground/10 transition-all flex items-center justify-center gap-2"
+                >
+                  {t('cta_secondary')} <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="flex items-center gap-12 py-10 border-t border-foreground/5 mt-12">
+                <div className="space-y-2">
+                  <p className="text-4xl font-black tracking-tighter">5 min</p>
+                  <p className="text-[11px] font-bold text-muted uppercase tracking-[0.3em]">{t('stat_time')}</p>
+                </div>
+                <div className="w-px h-12 bg-foreground/10" />
+                <div className="space-y-2">
+                  <p className="text-4xl font-black tracking-tighter">100%</p>
+                  <p className="text-[11px] font-bold text-muted uppercase tracking-[0.3em]">{t('stat_brand')}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Visual Column */}
+            <div className="relative group perspective-1000 hidden lg:block">
+              <div className="relative z-10 p-4 lg:p-12 animate-in fade-in zoom-in duration-1000 delay-300">
+                <div className="glass-panel p-2 rounded-[60px] shadow-executive">
+                  <div className="relative rounded-[52px] overflow-hidden aspect-[4/5] bg-charcoal flex items-center justify-center border border-white/5">
+                    <img 
+                      src="/logo.png" 
+                      alt="DYWGV Authority Core" 
+                      className="w-3/4 h-auto object-contain drop-shadow-[0_0_80px_rgba(18,178,193,0.4)] animate-float"
+                    />
+                    
+                    {/* Floating Overlay Widgets */}
+                    <div className="absolute top-12 left-12 p-6 px-10 glass-panel rounded-3xl animate-in slide-in-from-top-12 duration-1000 delay-500 shadow-2xl">
+                      <p className="text-[10px] font-black text-primary uppercase tracking-[0.5em] mb-2">Identity Active</p>
+                      <p className="text-sm font-bold text-white tracking-tight">Authority Engine: ON</p>
+                    </div>
+
+                    <div className="absolute bottom-12 right-12 p-8 glass-panel rounded-3xl animate-in slide-in-from-bottom-12 duration-1000 delay-700 max-w-[240px] shadow-2xl">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Shield className="w-5 h-5 text-primary" />
+                        <span className="text-[11px] font-black uppercase tracking-[0.3em] text-white">Strategic Lock</span>
+                      </div>
+                      <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full w-3/4 bg-primary animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Decorative Atmosphere */}
+                <div className="absolute -top-16 -right-16 w-48 h-48 border border-primary/20 rounded-full animate-pulse-slow blur-sm" />
+                <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-secondary/20 blur-[100px] rounded-full animate-float-slow" />
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Brand Philosophy Section */}
+        <section className="py-32 px-8 bg-charcoal/50 border-y border-foreground/5 relative overflow-hidden">
+          <div className="absolute inset-0 bg-primary/2 pointer-events-none" />
+          <div className="max-w-5xl mx-auto text-center space-y-10 relative z-10">
+            <h2 className="text-xs font-black uppercase tracking-[0.8em] text-primary">Mastering the Narrative</h2>
+            <p className="text-4xl lg:text-6xl font-heading font-black tracking-tight leading-[1.1]">
+              Stop guessing. Start leading. <br />
+              <span className="text-muted">DYWGV designs the perception that converts interest into authority-led revenue.</span>
+            </p>
+            <div className="pt-10">
+               <div className="w-16 h-1 bg-primary mx-auto rounded-full" />
+            </div>
+          </div>
+        </section>
+
+        {/* Process Section */}
+        <section className="py-40 px-8 bg-background relative overflow-hidden">
+          <div className="max-w-7xl mx-auto space-y-24">
+            <div className="text-center space-y-4">
+                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-primary">The Executive Path</h2>
+                <h3 className="text-4xl lg:text-5xl font-black tracking-tighter">Engineered for Influence</h3>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-12">
+               {[
+                 { icon: <UserCircle />, title: "Identity Core", desc: "Define your strategic baseline and authority triggers." },
+                 { icon: <LayoutDashboard />, title: "Visual Command", desc: "Project confidence through structured belief systems." },
+                 { icon: <Files />, title: "Intel Deployment", desc: "Execute high-impact content that locks market perception." }
+               ].map((item, idx) => (
+                 <div key={idx} className="group p-10 glass-panel rounded-[40px] hover:border-primary/40 transition-all duration-500 hover:-translate-y-2">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8 border border-primary/20 group-hover:bg-primary group-hover:text-background transition-all">
+                       {item.icon}
+                    </div>
+                    <h4 className="text-2xl font-black tracking-tight mb-4">{item.title}</h4>
+                    <p className="text-muted font-medium leading-relaxed opacity-60 group-hover:opacity-100 transition-opacity">{item.desc}</p>
+                 </div>
+               ))}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer System */}
+      <footer className="py-24 px-8 border-t border-foreground/5 bg-background relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+          <div className="flex items-center gap-5">
+            <img src="/logo.png" alt="DYWGV" className="h-10 w-auto opacity-70" />
+            <span className="font-heading font-black text-2xl tracking-tighter opacity-70">DYWGV</span>
+          </div>
+          
+          <div className="flex flex-col items-center gap-4">
+             <p className="text-[10px] font-black uppercase tracking-[0.6em] text-muted">Authority Systems Corp</p>
+             <div className="flex gap-10">
+                <a href="mailto:tangsopa.natchaya@gmail.com" className="text-[11px] font-bold text-muted hover:text-primary transition-colors flex items-center gap-2">
+                   <Mail className="w-3 h-3" /> Contact Architect
+                </a>
+             </div>
+          </div>
+
+          <div className="flex gap-12">
+            <Link href="#" className="text-[10px] font-black uppercase tracking-widest text-muted hover:text-primary transition-colors">Privacy Privacy</Link>
+            <Link href="#" className="text-[10px] font-black uppercase tracking-widest text-muted hover:text-primary transition-colors">Strategic Terms</Link>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto text-center mt-20 opacity-20">
+           <p className="text-[8px] font-black uppercase tracking-[0.8em]">Architectural Grade Identity Management</p>
+        </div>
+      </footer>
+    </div>
+  );
+}

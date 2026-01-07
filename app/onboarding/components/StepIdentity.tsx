@@ -24,29 +24,29 @@ export default function StepIdentity({ data, updateData }: Props) {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-xl font-bold text-slate-900">{t('onb_step1_title')}</h2>
+            <h2 className="text-xl font-black text-foreground">{t('onb_step1_title')}</h2>
 
             <div className="space-y-4">
                 <div>
-                    <label className="block text-xs uppercase font-bold text-slate-500 mb-2">{t('onb_label_brand')}</label>
+                    <label className="block text-[10px] uppercase font-black tracking-widest text-muted mb-2">{t('onb_label_brand')}</label>
                     <input
                         value={data.brand_name}
                         onChange={(e) => updateData('brand_name', e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none text-slate-900 placeholder:text-slate-400"
+                        className="w-full bg-background/50 border border-border rounded-2xl px-5 py-4 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 focus:outline-none text-foreground placeholder:text-muted/40 transition-all font-bold"
                         placeholder={t('onb_placeholder_brand')}
                     />
                 </div>
 
                 <div>
-                    <label className="block text-xs uppercase font-bold text-slate-500 mb-2">{t('onb_label_role')}</label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <label className="block text-[10px] uppercase font-black tracking-widest text-muted mb-2">{t('onb_label_role')}</label>
+                    <div className="grid grid-cols-2 gap-3">
                         {ROLES.map((role) => (
                             <button
                                 key={role}
                                 onClick={() => updateData('role', role.toLowerCase())}
-                                className={`px-4 py-3 rounded-xl border text-sm font-medium transition-all ${data.role === role.toLowerCase()
-                                    ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-900/20"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-400"
+                                className={`px-5 py-4 rounded-2xl border text-sm font-black uppercase tracking-widest transition-all ${data.role === role.toLowerCase()
+                                    ? "bg-primary border-primary text-white shadow-bubble shadow-primary/20"
+                                    : "bg-surface border-border text-muted hover:border-primary/30"
                                     }`}
                             >
                                 {t(roleMap[role] || role)}
@@ -56,15 +56,15 @@ export default function StepIdentity({ data, updateData }: Props) {
                 </div>
 
                 <div>
-                    <label className="block text-xs uppercase font-bold text-slate-500 mb-2">{t('onb_label_exp')}</label>
-                    <div className="flex gap-2">
+                    <label className="block text-[10px] uppercase font-black tracking-widest text-muted mb-2">{t('onb_label_exp')}</label>
+                    <div className="flex gap-3">
                         {EXP_LEVELS.map((level) => (
                             <button
                                 key={level}
                                 onClick={() => updateData('experience_level', level.toLowerCase())}
-                                className={`flex-1 px-4 py-3 rounded-xl border text-sm font-medium transition-all ${data.experience_level === level.toLowerCase()
-                                    ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-900/20"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-400"
+                                className={`flex-1 px-5 py-4 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all ${data.experience_level === level.toLowerCase()
+                                    ? "bg-primary border-primary text-white shadow-bubble shadow-primary/20"
+                                    : "bg-surface border-border text-muted hover:border-primary/30"
                                     }`}
                             >
                                 {t(expMap[level] || level)}

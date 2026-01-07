@@ -9,16 +9,21 @@ export type BrainBuilderState = {
     industry: string;
     value_proposition: string; // "I help X do Y"
 
-    // Step 3: Audience (Psychology)
+    // Step 3: Accuracy Gap
+    accuracy_identity: string;
+    accuracy_misconception: string;
+    accuracy_one_thing: string;
+
+    // Step 4: Audience (Psychology)
     target_audience_demographics: string;
     audience_pain: string;
     audience_desire: string;
 
-    // Step 4: Authority & Style
+    // Step 5: Authority & Style
     voice_tone: string; // "direct", "empathetic", "high-energy"
     authority_source: string; // "results", "logic", "curation"
 
-    // Step 5: Strategy
+    // Step 6: Strategy
     main_platform: string;
     monthly_goal: string;
     content_language: string;
@@ -31,6 +36,9 @@ export const INITIAL_BRAIN_STATE: BrainBuilderState = {
     niche: "",
     industry: "",
     value_proposition: "",
+    accuracy_identity: "",
+    accuracy_misconception: "",
+    accuracy_one_thing: "",
     target_audience_demographics: "",
     audience_pain: "",
     audience_desire: "",
@@ -59,6 +67,7 @@ export type StrategicProfile = {
         lane: string;
         mission: string;
         anti_topics: string[];
+        accuracy_pillar?: string;
     };
     audience: {
         description: string;

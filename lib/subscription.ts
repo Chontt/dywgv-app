@@ -10,7 +10,6 @@ export async function getSubscriptionStatus(userId: string): Promise<{ isPro: bo
         .select('status, current_period_end')
         .eq('user_id', userId)
         .in('status', ['active', 'trialing'])
-        .gt('current_period_end', new Date().toISOString())
         .maybeSingle();
 
     if (error) {

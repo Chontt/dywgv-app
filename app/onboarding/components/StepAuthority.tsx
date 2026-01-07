@@ -26,19 +26,19 @@ export default function StepAuthority({ data, updateData }: Props) {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-xl font-bold text-slate-900">{t('onb_step4_title')}</h2>
+            <h2 className="text-xl font-black text-foreground">{t('onb_step4_title')}</h2>
 
             <div className="space-y-4">
                 <div>
-                    <label className="block text-xs uppercase font-bold text-slate-500 mb-2">{t('onb_label_tone')}</label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <label className="block text-[10px] uppercase font-black tracking-widest text-muted mb-2">{t('onb_label_tone')}</label>
+                    <div className="grid grid-cols-2 gap-3">
                         {TONES.map((tone) => (
                             <button
                                 key={tone}
                                 onClick={() => updateData('voice_tone', tone)}
-                                className={`px-4 py-3 rounded-xl border text-left text-sm font-medium transition-all ${data.voice_tone === tone
-                                    ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-900/20"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-400"
+                                className={`px-5 py-4 rounded-2xl border text-left text-[11px] font-black uppercase tracking-widest transition-all ${data.voice_tone === tone
+                                    ? "bg-primary border-primary text-white shadow-bubble shadow-primary/20"
+                                    : "bg-surface border-border text-muted hover:border-primary/30"
                                     }`}
                             >
                                 {t(toneMap[tone] || tone)}
@@ -48,18 +48,20 @@ export default function StepAuthority({ data, updateData }: Props) {
                 </div>
 
                 <div>
-                    <label htmlFor="onb-authority-source" className="block text-xs uppercase font-bold text-slate-500 mb-2">{t('onb_label_source')}</label>
-                    <select
-                        id="onb-authority-source"
-                        value={data.authority_source}
-                        onChange={(e) => updateData('authority_source', e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none text-slate-900 appearance-none"
-                    >
-                        <option value="" disabled>{t('onb_placeholder_source')}</option>
-                        {SOURCES.map(source => (
-                            <option key={source} value={source}>{t(sourceMap[source] || source)}</option>
-                        ))}
-                    </select>
+                    <label htmlFor="onb-authority-source" className="block text-[10px] uppercase font-black tracking-widest text-muted mb-2">{t('onb_label_source')}</label>
+                    <div className="relative group/select">
+                        <select
+                            id="onb-authority-source"
+                            value={data.authority_source}
+                            onChange={(e) => updateData('authority_source', e.target.value)}
+                            className="w-full bg-background/50 border border-border rounded-2xl px-5 py-4 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 focus:outline-none text-foreground appearance-none font-bold transition-all"
+                        >
+                            <option value="" disabled>{t('onb_placeholder_source')}</option>
+                            {SOURCES.map(source => (
+                                <option key={source} value={source}>{t(sourceMap[source] || source)}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

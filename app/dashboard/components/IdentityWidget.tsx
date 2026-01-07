@@ -3,8 +3,14 @@
 import { useI18n } from "@/lib/i18n";
 import { useRouter } from "next/navigation";
 
+type Profile = {
+    id: string;
+    brand_name?: string | null;
+    role?: string | null;
+};
+
 type IdentityWidgetProps = {
-    profiles: any[];
+    profiles: Profile[];
     activeProfileId: string | null;
 };
 

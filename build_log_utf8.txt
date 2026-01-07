@@ -1,0 +1,84 @@
+﻿
+> my-app@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 9.5s
+  Running TypeScript ...
+node.exe : Failed to compile.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.e
+xe" "C:\Program Files\nodejs/node_m
+o ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~
+    + CategoryInfo          : NotS 
+   pecified: (Failed to compile.:  
+  String) [], RemoteException
+    + FullyQualifiedErrorId : Nati 
+   veCommandError
+ 
+
+./app/help/page.tsx:270:18
+Type error: No overload matches thi
+s call.
+  Overload 1 of 2, '(values: { id?:
+ string | undefined; user_id: strin
+g; rating: number; feedback_text: s
+tring; created_at?: string | undefi
+ned; }, options?: { count?: "exact"
+ | "planned" | "estimated" | undefi
+ned; } | undefined): PostgrestFilte
+rBuilder<...>', gave the following 
+error.
+    Object literal may only specify
+ known properties, and 'sentiment' 
+does not exist in type '{ id?: stri
+ng | undefined; user_id: string; ra
+ting: number; feedback_text: string
+; created_at?: string | undefined; 
+}'.
+  Overload 2 of 2, '(values: { id?:
+ string | undefined; user_id: strin
+g; rating: number; feedback_text: s
+tring; created_at?: string | undefi
+ned; }[], options?: { count?: "exac
+t" | "planned" | "estimated" | unde
+fined; defaultToNull?: boolean | un
+defined; } | undefined): PostgrestF
+ilterBuilder<...>', gave the follow
+ing error.
+    Object literal may only specify
+ known properties, and 'user_id' do
+es not exist in type '{ id?: string
+ | undefined; user_id: string; rati
+ng: number; feedback_text: string; 
+created_at?: string | undefined; }[
+]'.
+
+[0m [90m 268 |[39m             
+[36mconst[39m { error[33m:[39m s
+aveError } [33m=[39m [36mawait[
+39m supabase
+ [90m 269 |[39m                 
+[33m.[39m[36mfrom[39m([32m"user
+_feedback"[39m)
+[31m[1m>[22m[39m[90m 270 |[39
+m                 [33m.[39minsert
+({
+ [90m     |[39m                  
+[31m[1m^[22m[39m
+ [90m 271 |[39m                  
+   user_id[33m:[39m user[33m.[3
+9mid[33m,[39m
+ [90m 272 |[39m                  
+   sentiment[33m,[39m
+ [90m 273 |[39m                  
+   blocker[33m,[39m[0m
+Next.js build worker exited with co
+de: 1 and signal: null
+

@@ -2,6 +2,7 @@
 
 import { BrandProfile } from "@/types/app";
 import { useI18n } from "@/lib/i18n";
+import { Target, Check } from "lucide-react";
 
 type StrategyConfigProps = {
     profile: BrandProfile;
@@ -10,62 +11,63 @@ type StrategyConfigProps = {
 
 export default function StrategyConfig({ profile, onChange }: StrategyConfigProps) {
     const { t } = useI18n();
-    const goals = ["Trust", "Sales", "Growth", "Thought Leadership"];
-    const platforms = ["LinkedIn", "Twitter/X", "Instagram", "Newsletter"];
+    const goals = ["Authority Leverage", "Revenue Growth", "Ecosystem Trust", "Thought Dominance"];
+    const platforms = ["LinkedIn", "X / Twitter", "Podcast / Video", "Newsletter"];
 
     return (
-        <section className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
-            <h2 className="font-heading font-bold text-lg text-slate-900 mb-6 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center text-xs font-bold">3</span>
-                {t('profile_strategy_title')}
-            </h2>
+        <section className="bg-surface/40 backdrop-blur-xl rounded-[48px] border border-border p-12 lg:p-16 shadow-bubble space-y-12 transition-all duration-700">
+            <header className="flex items-center gap-6 border-b border-border pb-10">
+                <div className="w-14 h-14 rounded-[24px] bg-secondary/10 flex items-center justify-center text-secondary shadow-inner transition-transform hover:scale-110">
+                    <Target className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                    <h2 className="text-3xl font-black tracking-tight text-foreground">Revenue & <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Ecosystem</span></h2>
+                    <p className="text-[10px] font-black text-muted uppercase tracking-[0.4em]">Growth & Conversion Strategic Logic</p>
+                </div>
+            </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-6">
                 {/* Content Goal */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                        {t('strategy_goal_label')}
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-[0.5em] text-muted px-1 opacity-50">
+                        Primary Strategic Objective
                     </label>
-                    <p className="text-[10px] text-slate-400 mb-3">
-                        {t('strategy_goal_hint')}
-                    </p>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         {goals.map((g) => (
                             <button
                                 key={g}
                                 onClick={() => onChange({ content_goal: g })}
-                                className={`w-full text-left px-4 py-3 rounded-xl border text-sm font-medium transition-all flex items-center justify-between ${profile.content_goal === g
-                                    ? "border-pink-500 bg-pink-50 text-pink-700 shadow-sm"
-                                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
+                                className={`w-full text-left px-10 py-6 rounded-[32px] border text-[11px] font-black uppercase tracking-[0.3em] transition-all duration-500 flex items-center justify-between relative overflow-hidden group
+                                    ${profile.content_goal === g
+                                        ? "border-transparent bg-gradient-to-r from-primary to-secondary text-white shadow-bubble shadow-primary/20"
+                                        : "border-border bg-background/50 text-muted hover:border-primary/30"
                                     }`}
                             >
-                                {g}
-                                {profile.content_goal === g && <span>✓</span>}
+                                <span className="relative z-10">{g}</span>
+                                {profile.content_goal === g && <Check className="w-5 h-5 relative z-10" strokeWidth={4} />}
                             </button>
                         ))}
                     </div>
                 </div>
 
                 {/* Platform Focus */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                        {t('strategy_platform_label')}
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-[0.5em] text-muted px-1 opacity-50">
+                        Deployment Channel
                     </label>
-                    <p className="text-[10px] text-slate-400 mb-3">
-                        {t('strategy_platform_hint')}
-                    </p>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         {platforms.map((p) => (
                             <button
                                 key={p}
                                 onClick={() => onChange({ platform_focus: p })}
-                                className={`w-full text-left px-4 py-3 rounded-xl border text-sm font-medium transition-all flex items-center justify-between ${profile.platform_focus === p
-                                    ? "border-slate-900 bg-slate-900 text-white shadow-md"
-                                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
+                                className={`w-full text-left px-10 py-6 rounded-[32px] border text-[11px] font-black uppercase tracking-[0.3em] transition-all duration-500 flex items-center justify-between relative overflow-hidden group
+                                    ${profile.platform_focus === p
+                                        ? "border-transparent bg-gradient-to-r from-primary to-secondary text-white shadow-bubble shadow-primary/20"
+                                        : "border-border bg-background/50 text-muted hover:border-primary/30"
                                     }`}
                             >
-                                {p}
-                                {profile.platform_focus === p && <span>✓</span>}
+                                <span className="relative z-10">{p}</span>
+                                {profile.platform_focus === p && <Check className="w-5 h-5 relative z-10" strokeWidth={4} />}
                             </button>
                         ))}
                     </div>

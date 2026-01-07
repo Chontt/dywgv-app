@@ -89,6 +89,132 @@ export interface Database {
                 Update: any
                 Relationships: any[]
             }
+            daily_goals: {
+                Row: {
+                    id: string
+                    user_id: string
+                    goal_text: string
+                    is_completed: boolean
+                    created_at: string
+                    goal_date?: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    goal_text: string
+                    is_completed?: boolean
+                    created_at?: string
+                    goal_date?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    goal_text?: string
+                    is_completed?: boolean
+                    created_at?: string
+                    goal_date?: string
+                }
+                Relationships: any[]
+            }
+
+            daily_guidance: {
+                Row: {
+                    id: string
+                    user_id: string
+                    date: string
+                    role: string
+                    manifestation_text: string | null
+                    focus_action: string | null
+                    emotion: string | null
+                    reason: string | null
+                    anti_goal: string | null
+                    raw_json: Json | null
+                    is_completed: boolean
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    date?: string
+                    role: string
+                    manifestation_text?: string | null
+                    focus_action?: string | null
+                    emotion?: string | null
+                    raw_json?: Json | null
+                    is_completed?: boolean
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    date?: string
+                    role?: string
+                    manifestation_text?: string | null
+                    focus_action?: string | null
+                    emotion?: string | null
+                    raw_json?: Json | null
+                    is_completed?: boolean
+                    created_at?: string
+                }
+                Relationships: any[]
+            },
+            user_feedback: {
+                Row: {
+                    id: string
+                    user_id: string
+                    rating: number
+                    feedback_text: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    rating: number
+                    feedback_text: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    rating?: number
+                    feedback_text?: string
+                    created_at?: string
+                }
+                Relationships: any[]
+            }
+            plans: {
+                Row: {
+                    id: string
+                    user_id: string
+                    title: string
+                    type: '7_day' | '30_day'
+                    inputs: Json
+                    content: Json
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    title: string
+                    type: '7_day' | '30_day'
+                    inputs: Json
+                    content: Json
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    title?: string
+                    type?: '7_day' | '30_day'
+                    inputs?: Json
+                    content?: Json
+                    created_at?: string
+                    updated_at?: string
+                }
+                Relationships: any[]
+            },
             // Catch-all to prevent 'never' collapse
             [key: string]: any
         }

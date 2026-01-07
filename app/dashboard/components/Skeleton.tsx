@@ -6,7 +6,7 @@ interface SkeletonProps {
 
 export const Skeleton: React.FC<SkeletonProps> = ({ className = "" }) => {
     return (
-        <div className={`animate-shimmer rounded-md ${className}`} />
+        <span className={`animate-shimmer rounded-md inline-block ${className}`} />
     );
 };
 
@@ -21,14 +21,14 @@ export const SkeletonText: React.FC<{ lines?: number; className?: string }> = ({
     className = ""
 }) => {
     return (
-        <div className={`space-y-2 ${className}`}>
+        <span className={`block space-y-2 ${className}`}>
             {[...Array(lines)].map((_, i) => (
                 <Skeleton
                     key={i}
                     className={`h-4 ${i === lines - 1 ? 'w-2/3' : 'w-full'}`}
                 />
             ))}
-        </div>
+        </span>
     );
 };
 

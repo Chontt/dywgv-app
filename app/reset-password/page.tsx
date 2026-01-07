@@ -37,18 +37,18 @@ export default function ResetPasswordPage() {
                 <h1 className="text-2xl font-bold text-slate-50 mb-2 text-center">
                     Security Alert
                 </h1>
-                <p className="text-rose-400 text-center mb-6 text-sm bg-rose-950/30 p-3 rounded-lg border border-rose-900/50">
+                <p className="text-rose-400 text-center mb-6 text-base bg-rose-950/30 p-3 rounded-lg border border-rose-900/50">
                     Your account has been flagged for a security update. Please set a new, secure password to continue.
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-sm text-slate-300">New Password</label>
+                        <label className="text-base text-slate-300">New Password</label>
                         <input
                             type="password"
                             required
                             minLength={8}
-                            className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-base text-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Min 8 characters"
@@ -64,7 +64,7 @@ export default function ResetPasswordPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full mt-2 rounded-md bg-sky-500 hover:bg-sky-400 disabled:bg-sky-700 text-slate-950 font-semibold py-2 text-sm transition"
+                        className="w-full mt-2 rounded-md bg-sky-500 hover:bg-sky-400 disabled:bg-sky-700 text-slate-950 font-semibold py-2 text-base transition"
                     >
                         {loading ? "Updating..." : "Update Password & Continue"}
                     </button>

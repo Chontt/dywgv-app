@@ -18,16 +18,16 @@ export default function StepStrategy({ data, updateData }: Props) {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-xl font-bold text-slate-900">{t('onb_step5_title')}</h2>
+            <h2 className="text-xl font-black text-foreground">{t('onb_step5_title')}</h2>
 
             <div className="space-y-4">
                 <div>
-                    <label htmlFor="onb-main-platform" className="block text-xs uppercase font-bold text-slate-500 mb-2">{t('onb_label_platform')}</label>
+                    <label htmlFor="onb-main-platform" className="block text-[10px] uppercase font-black tracking-widest text-muted mb-2">{t('onb_label_platform')}</label>
                     <select
                         id="onb-main-platform"
                         value={data.main_platform}
                         onChange={(e) => updateData('main_platform', e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none text-slate-900"
+                        className="w-full bg-background/50 border border-border rounded-2xl px-5 py-4 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 focus:outline-none text-foreground appearance-none font-bold transition-all"
                     >
                         <option value="" disabled>{t('onb_placeholder_platform')}</option>
                         {PLATFORMS.map(p => (
@@ -37,12 +37,12 @@ export default function StepStrategy({ data, updateData }: Props) {
                 </div>
 
                 <div>
-                    <label htmlFor="onb-content-language" className="block text-xs uppercase font-bold text-slate-500 mb-2">{t('onb_label_language')}</label>
+                    <label htmlFor="onb-content-language" className="block text-[10px] uppercase font-black tracking-widest text-muted mb-2">{t('onb_label_language')}</label>
                     <select
                         id="onb-content-language"
                         value={data.content_language}
                         onChange={(e) => updateData('content_language', e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none text-slate-900"
+                        className="w-full bg-background/50 border border-border rounded-2xl px-5 py-4 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 focus:outline-none text-foreground font-bold transition-all"
                     >
                         {LANGUAGES.map(l => (
                             <option key={l.code} value={l.code}>{l.label}</option>
@@ -51,11 +51,11 @@ export default function StepStrategy({ data, updateData }: Props) {
                 </div>
 
                 <div>
-                    <label className="block text-xs uppercase font-bold text-slate-500 mb-2">{t('onb_label_goal')}</label>
+                    <label className="block text-[10px] uppercase font-black tracking-widest text-muted mb-2">{t('onb_label_goal')}</label>
                     <input
                         value={data.monthly_goal}
                         onChange={(e) => updateData('monthly_goal', e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none text-slate-900 placeholder:text-slate-400"
+                        className="w-full bg-background/50 border border-border rounded-2xl px-5 py-4 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 focus:outline-none text-foreground placeholder:text-muted/40 font-bold transition-all"
                         placeholder={t('onb_placeholder_goal')}
                     />
                 </div>

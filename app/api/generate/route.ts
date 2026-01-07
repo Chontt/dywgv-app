@@ -2,8 +2,11 @@ import { NextResponse } from "next/server";
 import { MASTER_SYSTEM_PROMPT } from "@/lib/prompts/core";
 import { STUDIO_SYSTEM_PROMPT } from "@/lib/prompts/studio";
 import { OUTPUT_CONTRACT } from "@/lib/prompts/contract";
+import { MASTER_LANGUAGE_CONTROL_PROMPT } from "@/lib/prompts/language";
+import { verifyAndRefineLanguage, detectLanguage } from "@/lib/utils/language";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabaseServer";
+import { checkAndIncrement } from "@/lib/entitlement";
 
 // Initialize OpenAI client only if key exists
 const apiKey = process.env.OPENAI_API_KEY;
@@ -25,66 +28,94 @@ export async function POST(request: Request) {
       form,
       profile,
       length = "medium",
+      authorityLevel,
       parts: requestedParts = ["Full script", "Caption"]
     } = await request.json();
 
-    // 2. Check Subscription & Usage
-    const { data: sub } = await supabase
-      .from('subscriptions')
-      .select('status, current_period_end')
-      .eq('user_id', user.id)
-      .in('status', ['active', 'trialing'])
-      .gt('current_period_end', new Date().toISOString())
-      .maybeSingle();
+    // 2. Check Entitlement (Atomic)
+    const entitlement = await checkAndIncrement(user.id, "studio_generate");
 
-    const isPro = !!sub;
+    if (!entitlement.allowed) {
+      return NextResponse.json({
+        error: "AUTHORITY_REQUIRED",
+        message: "You have reached your daily generation limit. Upgrade to Authority Plan to continue building leverage.",
+        upgradeUrl: "/plans"
+      }, { status: 402 });
+    }
+
+    const isPro = entitlement.tier === "premium";
     let finalParts = requestedParts;
 
     if (!isPro) {
-      // Free Plan Enforcement
-      const today = new Date().toISOString().split('T')[0];
-      const { count: generationsToday } = await supabase
-        .from('content_projects')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('created_at', today);
-
-      if ((generationsToday || 0) >= 3) {
-        return NextResponse.json({
-          error: "AUTHORITY_REQUIRED",
-          message: "You have reached your daily limit of 3 generations. Upgrade to Authority Plan for unlimited content.",
-          upgradeUrl: "/plans"
-        }, { status: 402 });
-      }
-
-      // Restrict Parts
-      const ALLOWED_PARTS_FREE = ["Hooks", "Caption & Hashtags"];
-      // We map the requested parts to allowed ones if necessary, or just force them.
-      // For free users, we only allow them to get Hooks and Captions.
+      // Free Plan Feature Restrictions
+      const ALLOWED_PARTS_FREE = ["HOOK", "CAPTION", "HASHTAGS"];
       finalParts = requestedParts.filter((p: string) =>
-        p === "Hooks" || p === "Caption & Hashtags"
+        ALLOWED_PARTS_FREE.includes(p.toUpperCase())
       );
 
       if (finalParts.length === 0) {
-        finalParts = ["Hooks"];
+        finalParts = ["HOOK"];
       }
     }
 
-    // Construct the System Prompt Chain
-    // CORE -> STUDIO -> CONTRACT
-    const FULL_SYSTEM_PROMPT = `${MASTER_SYSTEM_PROMPT}
+    // Language Context (Reinforcement)
+    const langMap: Record<string, string> = {
+      'Thai': 'th',
+      'English': 'en',
+      'Japanese': 'jp',
+      'Korean': 'kr',
+      'th': 'th',
+      'en': 'en',
+      'jp': 'jp',
+      'ja': 'jp',
+      'kr': 'kr',
+      'ko': 'kr'
+    };
+
+    let targetLangCode = langMap[profile?.language] || langMap[profile?.language?.split(' ')[0]];
+
+    // 2.5 Hybrid Mode & Smart Override
+    if (openai) {
+      const firstFormValue = Object.values(form).find(v => typeof v === 'string' && (v as string).length > 5) as string;
+
+      if (firstFormValue) {
+        const detectedInputLang = await detectLanguage(openai, firstFormValue);
+
+        // Smart Override: If profile is English (or not set), but input is non-English, trust the input.
+        if ((!targetLangCode || targetLangCode === 'en') && detectedInputLang !== 'en') {
+          console.log(`[LanguageGuard] Smart Override: Overriding ${targetLangCode || 'none'} with detected ${detectedInputLang} from input.`);
+          targetLangCode = detectedInputLang;
+        } else if (!targetLangCode) {
+          targetLangCode = detectedInputLang;
+        }
+      }
+    }
+
+    targetLangCode = targetLangCode || 'en';
+
+    // Construct the System Prompt Chain with Language Lock
+    const FULL_SYSTEM_PROMPT = `
+${MASTER_LANGUAGE_CONTROL_PROMPT.replace('TARGET_LANGUAGE', `TARGET_LANGUAGE = "${targetLangCode}"`)}
 
 ---
 
+${MASTER_SYSTEM_PROMPT}
+
+---
+
+${MASTER_SYSTEM_PROMPT.includes('dywgv') ? '' : 'Brand: dywgv (Influence & Revenue System)'}
 ${STUDIO_SYSTEM_PROMPT}
 
 ---
 
 ${OUTPUT_CONTRACT}`;
 
-    // Language Context (Reinforcement)
-    const languageInstruction = `TARGET LANGUAGE: ${profile?.language || 'English'}
-NOTE: Output must be 100% in the target language.`;
+    const languageInstruction = `
+CRITICAL: You are locked into TARGET_LANGUAGE = ${targetLangCode}.
+Generate all content parts strictly in this language.
+Do NOT translate the labels (HOOK:, OUTLINE:, FULL SCRIPT:, CAPTION:, HASHTAGS:).
+Keep labels in English, but the content must be 100% in ${targetLangCode}.
+`;
 
     // Construct User Prompt (Context)
     // Extract hidden strategic fields
@@ -101,8 +132,8 @@ ${antiGoal ? `- ANTI-GOAL (STRICT): ${antiGoal}. Do NOT violate this.` : ""}
 CONTEXT:
 - Mode: ${mode}
 - Content Kind: ${contentKind}
-- Profile Brand: ${profile?.brand_name || profile?.business_name}
-- Role/Authority: ${profile?.role} (${profile?.authority_level})
+- Profile Brand: ${profile?.brand_name}
+- Role/Authority: ${profile?.role} (${authorityLevel || profile?.authority_level})
 - Target Audience: ${profile?.target_audience}
 - Content Goal: ${profile?.content_goal}
 - Tone: ${profile?.tone}
@@ -115,7 +146,7 @@ ${Object.entries(form).map(([k, v]) => !k.startsWith('_') && k !== 'everyday_rol
 ${strategicConstraints}
 ${languageInstruction}
 
-Generate the content parts requested.
+Generate the content parts requested. Follow the OUTPUT_CONTRACT strictly: NO MARKDOWN. NO BULLETS. Label each part clearly in ALL CAPS (e.g., HOOK:).
 `;
 
     if (!openai) {
@@ -123,23 +154,24 @@ Generate the content parts requested.
       await new Promise(r => setTimeout(r, 1500));
 
       return NextResponse.json({
-        content: `[MOCK GENERATION - API KEY MISSING]
-        
-Hooks:
-1. Stop doing ${form.topic} the wrong way.
-2. The secret to ${form.topic} isn't what you think.
+        content: `MOCK INTEL STREAM: DYWGV_REVENUE_ARCHITECT_v1
 
-Full script:
-"Hey guys, if you are struggling with ${form.topic}, listen up.
-Most people think it's about X, but it's actually about Y.
-I tried this myself and the results were crazy.
-Just check the link in bio for the full guide."
+HOOK:
+Most systems optimize for attention. We optimize for belief. This is how you build authority for ${form.topic || 'your niche'} without the hype.
 
-Caption:
-Stop struggling with ${form.topic}. 🛑
-We found a better way.
-#${form.topic?.replace(/\s/g, '')}
-`
+OUTLINE:
+- The attention-belief gap in current market strategy
+- Why ${form.topic || 'this approach'} fails long-term leverage
+- The triad of authority: Tone, Proof, and Consistent Revenue logic
+
+FULL SCRIPT:
+Authority isn't something you claim. It is something the market grants you when your logic is undeniable. For ${form.topic || 'your business'}, the focus shouldn't be on the next viral trend. It should be on the architecture of your message. Stop optimizing for clicks and start optimizing for conviction. This is the difference between labor and leverage.
+
+CAPTION:
+Conviction scales. Clicks don't. We built the DYWGV system to Architect Influence, not just content. If you're building for the next decade, not the next hour, this is the intel you need.
+
+HASHTAGS:
+#DYWGV #RevenueArchitecture #InfluenceScale #AuthoritySystem`
       });
     }
 
@@ -148,13 +180,16 @@ We found a better way.
         { role: "system", content: FULL_SYSTEM_PROMPT },
         { role: "user", content: userPrompt },
       ],
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o",
       temperature: 0.7,
     });
 
     const content = completion.choices[0]?.message?.content || "";
 
-    return NextResponse.json({ content });
+    // Phase 3: Output Verification (Post-check)
+    const refinedContent = await verifyAndRefineLanguage(openai, content, targetLangCode);
+
+    return NextResponse.json({ content: refinedContent });
 
   } catch (error) {
     console.error("Generate API Error:", error);

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { ONBOARDING_SYSTEM_PROMPT } from "@/lib/prompts/onboarding";
+import { MASTER_LANGUAGE_CONTROL_PROMPT } from "@/lib/prompts/language";
+import { verifyAndRefineJSONLanguage, detectLanguage } from "@/lib/utils/language";
 import OpenAI from "openai";
 import { supabase } from "@/lib/supabase"; // Note: This might be client side supabase, we need admin or server client if checking auth on server, but typically we just trust the client sends valid data if we don't have strict backend auth check middleware yet. For now, let's just use the OpenAI part.
 // Actually, better to check auth context if possible, but let's stick to the generation logic first.
@@ -7,10 +9,26 @@ import { supabase } from "@/lib/supabase"; // Note: This might be client side su
 const apiKey = process.env.OPENAI_API_KEY;
 const openai = apiKey ? new OpenAI({ apiKey }) : null;
 
+interface OnboardingInputs {
+    role?: string;
+    niche?: string;
+    industry?: string;
+    value_proposition?: string;
+    target_audience_demographics?: string;
+    audience_pain?: string;
+    audience_desire?: string;
+    voice_tone?: string;
+    main_platform?: string;
+    accuracy_identity?: string;
+    accuracy_misconception?: string;
+    accuracy_one_thing?: string;
+    language?: string;
+}
+
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { inputs } = body;
+        const { inputs } = body as { inputs: OnboardingInputs };
 
         // TODO: Verify User Auth if critical.
 
@@ -20,12 +38,41 @@ export async function POST(request: Request) {
             return NextResponse.json(mockProfile(inputs));
         }
 
+        let targetLangCode = inputs.language || 'en';
+
+        // 2.5 Hybrid Mode & Smart Override
+        if (openai) {
+            const detectedInputLang = await detectLanguage(openai, JSON.stringify(inputs));
+
+            // Smart Override: If input language is English (default), but survey values are foreign, trust the survey.
+            if ((!inputs.language || targetLangCode === 'en' || targetLangCode === 'English') && detectedInputLang !== 'en') {
+                console.log(`[LanguageGuard] Smart Override: Overriding ${targetLangCode} with detected ${detectedInputLang} from onboarding inputs.`);
+                targetLangCode = detectedInputLang;
+            } else if (!inputs.language) {
+                targetLangCode = detectedInputLang;
+            }
+        }
+
+        targetLangCode = targetLangCode || 'en';
+
+        const FULL_SYSTEM_PROMPT = `
+${MASTER_LANGUAGE_CONTROL_PROMPT.replace('TARGET_LANGUAGE', `TARGET_LANGUAGE = "${targetLangCode}"`)}
+
+---
+
+${ONBOARDING_SYSTEM_PROMPT}
+
+---
+
+CRITICAL: Generate the JSON response such that all keys are in English (matching the schema), but all values are written strictly in ${targetLangCode}.
+`;
+
         const completion = await openai.chat.completions.create({
             messages: [
-                { role: "system", content: ONBOARDING_SYSTEM_PROMPT },
+                { role: "system", content: FULL_SYSTEM_PROMPT },
                 { role: "user", content: JSON.stringify(inputs, null, 2) },
             ],
-            model: "gpt-4-turbo-preview",
+            model: "gpt-4o",
             temperature: 0.7,
             response_format: { type: "json_object" }
         });
@@ -34,7 +81,11 @@ export async function POST(request: Request) {
         if (!content) throw new Error("No content generated");
 
         const profile = JSON.parse(content);
-        return NextResponse.json(profile);
+
+        // Phase 3: Output Verification (Post-check)
+        const refinedProfile = await verifyAndRefineJSONLanguage(openai, profile, targetLangCode);
+
+        return NextResponse.json(refinedProfile);
 
     } catch (error) {
         console.error("Onboarding Synthesis Error:", error);
@@ -45,7 +96,7 @@ export async function POST(request: Request) {
     }
 }
 
-function mockProfile(inputs: any) {
+function mockProfile(inputs: OnboardingInputs) {
     return {
         identity: {
             role: inputs.role || "creator",
@@ -53,9 +104,10 @@ function mockProfile(inputs: any) {
             experience_level: "growing"
         },
         positioning: {
-            lane: `${inputs.niche} for ${inputs.industry}`,
+            lane: `${inputs.niche || 'Niche'} for ${inputs.industry || 'Industry'}`,
             mission: inputs.value_proposition || "To help people win.",
-            anti_topics: ["Generic advice", "Get rich quick"]
+            anti_topics: ["Generic advice", "Get rich quick"],
+            accuracy_pillar: inputs.accuracy_one_thing || "Precision Execution"
         },
         audience: {
             description: inputs.target_audience_demographics || "General audience",

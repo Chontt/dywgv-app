@@ -2,6 +2,7 @@
 
 import { BrandProfile } from "@/types/app";
 import { useI18n } from "@/lib/i18n";
+import { Volume2, CircleOff, Sparkles, Zap } from "lucide-react";
 
 type VoiceConfigProps = {
     profile: BrandProfile;
@@ -10,65 +11,68 @@ type VoiceConfigProps = {
 
 export default function VoiceConfig({ profile, onChange }: VoiceConfigProps) {
     const { t } = useI18n();
-    const tones = ["calm", "confident", "bold", "luxury", "friendly"];
-    const emojiOptions = ["none", "minimal", "allowed"];
+    const tones = ["calm", "confident", "direct", "luxury"];
+    const emojiOptions = [
+        { id: "none", label: "None", icon: <CircleOff className="w-4 h-4" /> },
+        { id: "minimal", label: "Minimalist", icon: <Sparkles className="w-4 h-4" /> },
+        { id: "strategic", label: "Strategic", icon: <Zap className="w-4 h-4" /> },
+    ];
 
     return (
-        <section className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
-            <h2 className="font-heading font-bold text-lg text-slate-900 mb-6 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold">2</span>
-                {t('profile_voice_title')}
-            </h2>
+        <section className="bg-surface/40 backdrop-blur-xl rounded-[48px] border border-border p-12 lg:p-16 shadow-bubble space-y-12 transition-all duration-700">
+            <header className="flex items-center gap-6 border-b border-border pb-10">
+                <div className="w-14 h-14 rounded-[24px] bg-secondary/10 flex items-center justify-center text-secondary shadow-inner transition-transform hover:scale-110">
+                    <Volume2 className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                    <h2 className="text-3xl font-black tracking-tight text-foreground">Strategic <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Voice</span></h2>
+                    <p className="text-[10px] font-black text-muted uppercase tracking-[0.4em]">Influence & Resonance Configuration</p>
+                </div>
+            </header>
 
-            <div className="space-y-6">
-                {/* Tone */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                        {t('voice_tone_label')}
+            <div className="space-y-12 pt-6">
+                {/* Tone Grid */}
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-[0.5em] text-muted px-1 opacity-50">
+                        Primary Auditory Archetype
                     </label>
-                    <p className="text-[10px] text-slate-400 mb-3">
-                        {t('voice_tone_hint')}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                        {tones.map((t) => (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                        {tones.map((tone) => (
                             <button
-                                key={t}
-                                onClick={() => onChange({ niche: t })}
-                                className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${profile.niche === t
-                                    ? "border-purple-600 bg-purple-50 text-purple-700 shadow-sm"
-                                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
+                                key={tone}
+                                onClick={() => onChange({ tone })}
+                                className={`px-8 py-6 rounded-[28px] border text-[10px] font-black uppercase tracking-[0.4em] transition-all duration-500 relative overflow-hidden group
+                                    ${profile.tone === tone
+                                        ? "border-transparent bg-gradient-to-br from-primary to-secondary text-white shadow-bubble shadow-primary/20"
+                                        : "border-border bg-background/50 text-muted hover:border-primary/30"
                                     }`}
                             >
-                                {t.charAt(0).toUpperCase() + t.slice(1)}
+                                <span className="relative z-10">{tone}</span>
                             </button>
                         ))}
                     </div>
                 </div>
 
                 {/* Emoji Preference */}
-                <div>
-                    <div className="flex items-center justify-between mb-2">
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            {t('voice_emoji_label')}
-                        </label>
-                        <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
-                            {t('voice_emoji_hint')}
-                        </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-[0.5em] text-muted px-1 opacity-50">
+                        Visual Syntax Protocols (Emojis)
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         {emojiOptions.map((opt) => (
                             <button
-                                key={opt}
-                                onClick={() => onChange({ emoji_preference: opt })}
-                                className={`py-3 rounded-xl border text-sm font-medium transition-all flex flex-col items-center gap-1 ${profile.emoji_preference === opt
-                                    ? "border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm"
-                                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
-                                    }`}
+                                key={opt.id}
+                                onClick={() => onChange({ emoji_preference: opt.id })}
+                                className={`p-8 rounded-[32px] border transition-all duration-500 text-center flex flex-col items-center gap-5 relative overflow-hidden group
+                                    ${profile.emoji_preference === opt.id
+                                        ? "border-primary/30 bg-surface text-foreground shadow-sm"
+                                        : "border-border bg-background/40 text-muted hover:border-primary/20 hover:bg-surface/60"}
+                                `}
                             >
-                                <span className="text-lg">
-                                    {opt === 'none' ? '🚫' : opt === 'minimal' ? '✨' : '🎉🔥🚀'}
-                                </span>
-                                {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ${profile.emoji_preference === opt.id ? "bg-primary/10 text-primary" : "bg-background text-muted group-hover:scale-110 opacity-50"}`}>
+                                    {opt.icon}
+                                </div>
+                                <span className="text-[11px] font-black uppercase tracking-widest leading-tight">{opt.label}</span>
                             </button>
                         ))}
                     </div>

@@ -2,6 +2,7 @@
 
 import { BrandProfile } from "@/types/app";
 import { useI18n } from "@/lib/i18n";
+import { Shield } from "lucide-react";
 
 type PositioningInputProps = {
     profile: BrandProfile;
@@ -10,70 +11,56 @@ type PositioningInputProps = {
 
 export default function PositioningInput({ profile, onChange }: PositioningInputProps) {
     const { t } = useI18n();
-    const impacts = ["Confident", "Inspired", "Calm", "Urgent", "Respected", "Happier"];
+    const impacts = ["Respect", "Intelligence", "Authority", "Trust", "Clarity", "Leverage"];
 
     return (
-        <section className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm relative overflow-hidden">
-            {/* Subtle premium background decoration */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full opacity-50 -mr-10 -mt-10"></div>
+        <section className="bg-surface/40 backdrop-blur-xl rounded-[48px] border border-border p-12 lg:p-16 shadow-bubble space-y-12 transition-all duration-700">
+            <header className="flex items-center gap-6 border-b border-border pb-10">
+                <div className="w-14 h-14 rounded-[24px] bg-secondary/10 flex items-center justify-center text-secondary shadow-inner transition-transform hover:scale-110">
+                    <Shield className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                    <h2 className="text-3xl font-black tracking-tight text-foreground">Market <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Positioning</span></h2>
+                    <p className="text-[10px] font-black text-muted uppercase tracking-[0.4em]">Belief Systems & Authority Framing</p>
+                </div>
+            </header>
 
-            <h2 className="font-heading font-bold text-lg text-slate-900 mb-6 flex items-center gap-2 relative z-10">
-                <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">4</span>
-                {t('profile_positioning_title')}
-            </h2>
-
-            <div className="relative z-10 space-y-6">
+            <div className="space-y-12 pt-6">
                 {/* Positioning Statement */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-[0.5em] text-muted px-1 opacity-50">
                         {t('positioning_title')}
                     </label>
                     <div className="relative">
-                        <span className="absolute left-4 top-3.5 text-slate-400 font-medium select-none">
-                            &quot;{t('positioning_prefix')}&quot;
-                        </span>
-                        <input
-                            type="text"
+                        <textarea
                             value={profile.positioning_statement || ""}
                             onChange={(e) => onChange({ positioning_statement: e.target.value })}
-                            className="w-full pl-[240px] pr-4 py-3 bg-slate-50 border-none rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 placeholder-slate-300"
+                            className="w-full bg-background/50 border border-border rounded-[40px] p-10 text-[15px] font-bold text-foreground placeholder:text-muted/10 focus:border-secondary/50 focus:ring-8 focus:ring-secondary/5 transition-all outline-none leading-[2] resize-none shadow-sm"
+                            rows={5}
                             placeholder={t('positioning_placeholder')}
                         />
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-2">
-                        {t('positioning_hint')}
-                    </p>
                 </div>
 
                 {/* Emotional Impact */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
-                        {t('emotional_impact_label')}
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-[0.5em] text-muted px-1 opacity-50">
+                        Target Perception Protocol
                     </label>
-                    <p className="text-xs text-slate-400 mb-3">
-                        {t('emotional_impact_hint')}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-4">
                         {impacts.map((imp) => (
                             <button
                                 key={imp}
                                 onClick={() => onChange({ emotional_impact: imp })}
-                                className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${profile.emotional_impact === imp
-                                    ? "border-indigo-600 bg-indigo-600 text-white shadow-md shadow-indigo-200"
-                                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-indigo-600"
+                                className={`px-10 py-5 rounded-[24px] border text-[11px] font-black uppercase tracking-[0.3em] transition-all duration-500 relative overflow-hidden group
+                                    ${profile.emotional_impact === imp
+                                        ? "border-transparent bg-gradient-to-r from-primary to-secondary text-white shadow-bubble shadow-primary/20"
+                                        : "border-border bg-background/50 text-muted hover:border-secondary/30 hover:shadow-sm"
                                     }`}
                             >
-                                {imp}
+                                <span className="relative z-10">{imp}</span>
                             </button>
                         ))}
-                        <input
-                            type="text"
-                            placeholder={t('emotional_custom_placeholder')}
-                            className="px-4 py-2 rounded-full border border-slate-200 bg-transparent text-sm w-24 focus:w-32 transition-all focus:border-indigo-500 outline-none"
-                            onChange={(e) => {
-                                if (e.target.value.length > 2) onChange({ emotional_impact: e.target.value })
-                            }}
-                        />
                     </div>
                 </div>
             </div>

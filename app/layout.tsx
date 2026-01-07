@@ -32,8 +32,13 @@ const notoSansKR = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "PROMPTY",
-  description: "AI Social Content & Planning Studio",
+  title: "DYWGV | Influence & Revenue System",
+  description: "Architecting authority through strategic intelligence.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/logo.png",
+  },
 };
 
 import LanguageProvider from "./components/LanguageProvider";

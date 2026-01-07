@@ -2,58 +2,128 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---- theme & body style (ใช้ได้ปกติ) ---- */
-
+/* DYWGV Soft Pastel Aesthetic */
+/* Digital Calm (Luxury Pastel) Global Tokens */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Palettes */
+  --pastel-periwinkle: #8E9AFE;
+  --pastel-mist: #96E9D5;
+  --pastel-sand: #FFD2B8;
+  --pure-white: #FFFFFF;
+
+  /* Light Theme tokens */
+  --background: #F9FAFC;
+  --foreground: #1E293B;
+  /* Slate 800 */
+  --surface: #FFFFFF;
+  --border: #E2E8F0;
+  /* Slate 200 */
+
+  --primary: var(--pastel-periwinkle);
+  --secondary: var(--pastel-mist);
+  --accent: var(--pastel-sand);
+  --muted: #64748B;
+  /* Slate 500 */
+
+  --radius-xl: 1.5rem;
+  /* Standard luxury radius */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  /* Dark Theme tokens */
+  --background: #0F1115;
+  /* Custom Deep Onyx */
+  --foreground: #F1F5F9;
+  /* Slate 100 */
+  --surface: #16191F;
+  /* Surface slight lift */
+  --border: #1E293B;
+  /* Slate 800 */
+
+  --primary: var(--pastel-periwinkle);
+  --secondary: var(--pastel-mist);
+  --accent: var(--pastel-sand);
+  --muted: #94A3B8;
+  /* Slate 400 */
 }
 
 body {
-  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
+  font-size: 16px;
+  /* Increased base size */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.5s ease, color 0.5s ease;
+  background-image:
+    radial-gradient(at 0% 0%, var(--primary) 0px, transparent 40%),
+    radial-gradient(at 100% 100%, var(--secondary) 0px, transparent 40%);
+  background-attachment: fixed;
+}
+
+/* Typography Polish */
+h1,
+h2,
+h3,
+h4,
+.font-heading {
+  letter-spacing: -0.04em !important;
+  line-height: 1.1;
+}
+
+/* Premium UI Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.03);
+}
+
+.dark .glass-panel {
+  background: rgba(22, 25, 31, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+/* Brand Gradient Utility (Digital Calm) */
+.brand-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Language Specific Fonts */
 html.lang-th body {
-  font-family: var(--font-noto-thai), sans-serif;
+  font-family: "Noto Sans Thai", sans-serif;
 }
 
 html.lang-ja body {
-  font-family: var(--font-noto-jp), sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
 }
 
 html.lang-ko body {
-  font-family: var(--font-noto-kr), sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
-/* Shimmer Animation for Skeletons */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
+/* Custom Scrollbar (Stealth) */
+::-webkit-scrollbar {
+  width: 4px;
 }
 
-.animate-shimmer {
-  background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 50%, #f1f5f9 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.dark .animate-shimmer {
-  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
-  background-size: 200% 100%;
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+  opacity: 0.3;
 }

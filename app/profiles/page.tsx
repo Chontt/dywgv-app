@@ -13,13 +13,15 @@ import PositioningInput from "./components/PositioningInput";
 import { getSubscriptionStatus } from "@/lib/subscription";
 import { usePlan } from "@/lib/hooks/usePlan";
 import Link from "next/link";
+import { Shield, Plus, Zap, Lock } from "lucide-react";
 
 export default function ProfileIdentityPage() {
     const router = useRouter();
     const { t } = useI18n();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [profile, setProfile] = useState<BrandProfile | null>(null);
+    const [profiles, setProfiles] = useState<BrandProfile[]>([]);
+    const [activeProfile, setActiveProfile] = useState<BrandProfile | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
     const [isPro, setIsPro] = useState(false);
 
@@ -27,7 +29,7 @@ export default function ProfileIdentityPage() {
     const { isPro: isProFromPlan } = usePlan();
     const effectiveIsPro = isProFromPlan ?? false;
 
-    // Load active profile
+    // Load data
     useEffect(() => {
         async function load() {
             const { data: { user } } = await supabase.auth.getUser();
@@ -35,26 +37,30 @@ export default function ProfileIdentityPage() {
                 router.replace("/login");
                 return;
             }
-            setUserId(user.email || "");
+            setUserId(user.id);
 
             // Check Subscription
             const { isPro: proStatus } = await getSubscriptionStatus(user.id);
             setIsPro(proStatus);
 
-            const { data: settings } = await supabase
-                .from("user_settings")
-                .select("active_profile_id")
+            const { data: allProfiles } = await supabase
+                .from("brand_profiles")
+                .select("*")
                 .eq("user_id", user.id)
-                .maybeSingle();
+                .order("created_at", { ascending: false });
 
-            if ((settings as any)?.active_profile_id) {
-                const { data: activeP } = await supabase
-                    .from("brand_profiles")
-                    .select("*")
-                    .eq("id", (settings as any).active_profile_id)
+            if (allProfiles) {
+                setProfiles(allProfiles as BrandProfile[]);
+
+                const { data: settings } = await supabase
+                    .from("user_settings")
+                    .select("active_profile_id")
+                    .eq("user_id", user.id)
                     .maybeSingle();
 
-                if (activeP) setProfile(activeP as BrandProfile);
+                const activeId = (settings as any)?.active_profile_id || (allProfiles[0] as BrandProfile)?.id;
+                const active = (allProfiles as BrandProfile[]).find(p => p.id === activeId) || (allProfiles[0] as BrandProfile);
+                if (active) setActiveProfile(active);
             }
             setLoading(false);
         }
@@ -62,217 +68,179 @@ export default function ProfileIdentityPage() {
     }, [router]);
 
     const handleUpdate = (updates: Partial<BrandProfile>) => {
-        if (!profile) return;
-        setProfile({ ...profile, ...updates });
+        if (!activeProfile) return;
+        const updatedProfile = { ...activeProfile, ...updates };
+        setActiveProfile(updatedProfile);
+        setProfiles(prev => prev.map(p => p.id === activeProfile.id ? updatedProfile : p));
     };
 
-    const handleSave = async () => {
-        if (!profile) return;
-        setSaving(true);
+    const [saved, setSaved] = useState(false);
 
-        // Explicitly map BrandProfile fields to Supabase Database Row structure
+    const handleSave = async () => {
+        if (!activeProfile) return;
+        setSaving(true);
+        setSaved(false);
+
         const updates: any = {
-            brand_name: profile.brand_name,
-            role: profile.role,
-            niche: profile.niche,
-            // Tone is mapped to niche currently? No, wait, 'tone' exists in my BrandProfile type locally, 
-            // but in DB I might have missed it. 
-            // In types/supabase.ts line 22: tone: string | null. It EXISTS.
-            // So I should map it.
-            tone: profile.tone, // Mapped correctly now
-            authority_level: profile.authority_level,
-            emoji_preference: profile.emoji_preference,
-            content_goal: profile.content_goal,
-            platform_focus: profile.platform_focus,
-            positioning_statement: profile.positioning_statement,
-            emotional_impact: profile.emotional_impact,
+            brand_name: activeProfile.brand_name,
+            role: activeProfile.role,
+            niche: activeProfile.niche,
+            tone: activeProfile.tone,
+            authority_level: activeProfile.authority_level,
+            emoji_preference: activeProfile.emoji_preference,
+            content_goal: activeProfile.content_goal,
+            platform_focus: activeProfile.platform_focus,
+            positioning_statement: activeProfile.positioning_statement,
+            emotional_impact: activeProfile.emotional_impact,
             updated_at: new Date().toISOString()
         };
 
         const { error } = await supabase
             .from("brand_profiles")
             .update(updates as any)
-            .eq("id", profile.id);
+            .eq("id", activeProfile.id);
 
         if (!error) {
-            router.refresh();
-            setTimeout(() => setSaving(false), 1000);
+            setSaving(false);
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
         } else {
             console.error(error);
             setSaving(false);
         }
     };
 
-    // Calculate Profile Strength (Gamification)
-    const calculateStrength = () => {
-        if (!profile) return 0;
-        let score = 0;
-        if (profile.brand_name) score += 10;
-        if (profile.role) score += 10;
-        if (profile.authority_level) score += 20; // High value
-        if (profile.niche) score += 10;
-        if (profile.target_audience) score += 10;
-        if (profile.content_goal) score += 10;
-        if (profile.tone) score += 10;
-        if (profile.positioning_statement) score += 20; // Hardest one
-        return score;
+    const switchProfile = async (p: BrandProfile) => {
+        setActiveProfile(p);
+        await supabase.from("user_settings").upsert({ user_id: userId, active_profile_id: p.id });
     };
 
-    const strength = calculateStrength();
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-6 transition-colors duration-500">
+                <div className="relative">
+                    <img src="/logo.png" alt="DYWGV" className="w-20 h-20 opacity-20 animate-pulse transition-transform duration-1000 scale-110" />
+                    <div className="absolute inset-0 bg-primary/20 blur-2xl animate-pulse rounded-full" />
+                </div>
+                <div className="space-y-2 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted">Synchronizing Identities</p>
+                    <div className="h-0.5 w-24 bg-border mx-auto rounded-full overflow-hidden">
+                        <div className="h-full bg-primary w-1/2 animate-[shimmer_2s_infinite]" />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900">
-            {/* Modal/Overlay Helper */}
-            <SideNav userEmail={userId} activeProfile={profile} isPro={isPro} />
+        <div className="flex min-h-screen bg-background font-sans text-foreground selection:bg-primary/30 transition-colors duration-500">
+            <SideNav userEmail={userId} activeProfile={activeProfile} isPro={isPro} />
 
-            <main className="flex-1 lg:ml-64 min-h-screen bg-slate-50 p-8 flex justify-center">
-                <div className="max-w-3xl w-full pt-8 pb-32">
+            <main className="flex-1 lg:ml-68 min-h-screen p-8 lg:p-20 flex flex-col items-center">
+                <div className="max-w-6xl w-full space-y-20 pb-40">
 
-                    {/* Motivational Header Card */}
-                    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-bl-full -mr-16 -mt-16 opacity-50 pointer-events-none"></div>
-
-                        <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start md:items-center">
-                            {/* Avatar */}
-                            <div className="shrink-0 relative">
-                                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5 shadow-xl shadow-indigo-200">
-                                    <div className="w-full h-full bg-slate-50 rounded-2xl border-2 border-white flex items-center justify-center overflow-hidden">
-                                        {(profile?.avatar_url) ? (
-                                            <img src={profile.avatar_url} alt="You" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <span className="font-heading font-bold text-3xl text-indigo-600">
-                                                {(profile?.brand_name || "C").charAt(0).toUpperCase()}
-                                            </span>
-                                        )}
-                                    </div>
+                    {/* Header: Identity Switcher */}
+                    <header className="space-y-12">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-border pb-12">
+                            <div className="space-y-4">
+                                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20 text-[10px] font-black uppercase tracking-[0.3em] text-secondary">
+                                    <Shield className="w-4 h-4" /> Identity Hub
                                 </div>
-                                <div className="absolute -bottom-3 -right-3 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider border-2 border-white">
-                                    {t('profile_lvl')} {Math.floor(strength / 10) + 1}
-                                </div>
+                                <h1 className="text-6xl lg:text-7xl font-black tracking-tighter text-foreground">Authority <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Base</span></h1>
+                                <p className="text-[11px] font-black text-muted uppercase tracking-[0.4em] leading-relaxed">Strategic Control Center for Multi-Identity Synchronization</p>
                             </div>
-
-                            {/* Text & Stats */}
-                            <div className="flex-1 w-full">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div>
-                                        <h1 className="font-heading text-2xl font-bold text-slate-900">
-                                            {profile?.brand_name || t('profile_new_brand')}
-                                        </h1>
-                                        <p className="text-slate-500 text-sm font-medium">
-                                            {profile?.role || t('profile_role_creator')} • {profile?.niche || t('profile_niche_unspecified')}
-                                        </p>
-                                    </div>
-                                    {!isPro && (
-                                        <button onClick={() => router.push('/plans')} className="hidden md:block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg hover:bg-indigo-100 transition-colors">
-                                            {t('profile_upgrade_identity')}
-                                        </button>
-                                    )}
-                                </div>
-
-                                {/* Progress Bar */}
-                                <div className="mt-4">
-                                    <div className="flex items-center justify-between text-xs font-bold mb-1.5">
-                                        <span className="text-slate-400 uppercase tracking-wider">{t('profile_strength_label')}</span>
-                                        <span className={strength === 100 ? "text-emerald-600" : "text-indigo-600"}>{strength}%</span>
-                                    </div>
-                                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                                        <div
-                                            className={`h-full rounded-full transition-all duration-1000 ${strength === 100 ? 'bg-emerald-500' : 'bg-gradient-to-r from-indigo-500 to-purple-500'}`}
-                                            style={{ width: `${strength}%` }}
-                                        ></div>
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 mt-2">
-                                        {strength < 50 ? t('profile_strength_complete') : t('profile_strength_ready')}
-                                    </p>
-                                </div>
-                            </div>
+                            <Link href="/onboarding" className="group relative px-10 py-5 bg-gradient-to-r from-primary to-secondary text-white rounded-[28px] text-[11px] font-black uppercase tracking-[0.3em] shadow-bubble shadow-primary/20 hover:scale-[1.05] active:scale-95 transition-all flex items-center gap-4">
+                                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" /> Establish New Identity
+                            </Link>
                         </div>
-                    </div>
 
-                    {loading ? (
-                        <div className="animate-pulse space-y-4">
-                            <div className="h-64 bg-white rounded-3xl border border-slate-100"></div>
-                            <div className="h-64 bg-white rounded-3xl border border-slate-100"></div>
+                        {/* Profiles Scroll/Grid */}
+                        <div className="flex flex-wrap gap-6">
+                            {profiles.map(p => (
+                                <button
+                                    key={p.id}
+                                    onClick={() => switchProfile(p)}
+                                    className={`group flex items-center gap-6 p-6 pr-10 rounded-[40px] border transition-all duration-500 relative overflow-hidden
+                                        ${activeProfile?.id === p.id
+                                            ? 'bg-surface border-border text-foreground shadow-bubble translate-y-[-4px]'
+                                            : 'bg-surface/40 border-transparent text-muted hover:bg-surface/60 hover:border-border'}
+                                    `}
+                                >
+                                    <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center text-2xl font-black transition-all duration-500 ${activeProfile?.id === p.id ? 'bg-gradient-to-br from-primary to-secondary text-white shadow-lg' : 'bg-background text-muted group-hover:scale-110 opacity-50'}`}>
+                                        {p.brand_name?.charAt(0) || 'D'}
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-[13px] font-black uppercase tracking-widest leading-none mb-2.5">{p.brand_name || 'Untitled Identity'}</p>
+                                        <div className="flex items-center gap-2.5">
+                                            <div className={`w-2 h-2 rounded-full ${activeProfile?.id === p.id ? 'bg-secondary animate-pulse' : 'bg-border'}`} />
+                                            <p className={`text-[10px] font-black uppercase tracking-widest opacity-60 text-muted`}>{p.role || 'High-Authority Generator'}</p>
+                                        </div>
+                                    </div>
+                                    {activeProfile?.id === p.id && <div className="absolute top-5 right-5 w-2.5 h-2.5 bg-secondary rounded-full shadow-sm"></div>}
+                                </button>
+                            ))}
                         </div>
-                    ) : profile ? (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    </header>
 
-                            {/* Section 1: Core Identity */}
-                            <div className="relative group">
-                                <div className="absolute -left-12 top-8 text-slate-300 font-heading font-bold text-4xl opacity-0 xl:opacity-20 group-hover:opacity-100 transition-opacity">01</div>
-                                <IdentitySection profile={profile} onChange={handleUpdate} />
-                            </div>
+                    {activeProfile ? (
+                        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
 
-                            {/* Section 2: Voice & Tone */}
-                            <div className="relative group">
-                                <div className="absolute -left-12 top-8 text-slate-300 font-heading font-bold text-4xl opacity-0 xl:opacity-20 group-hover:opacity-100 transition-opacity">02</div>
-                                <GatedSection isPro={effectiveIsPro} title="Voice & Tone Strategy">
-                                    <VoiceConfig profile={profile} onChange={handleUpdate} />
+                            {/* Identity Section */}
+                            <IdentitySection profile={activeProfile} onChange={handleUpdate} />
+
+                            {/* Gated Strategy Sections */}
+                            <div className="space-y-12">
+                                <GatedSection isPro={effectiveIsPro} title="Strategic Voice">
+                                    <VoiceConfig profile={activeProfile} onChange={handleUpdate} />
                                 </GatedSection>
-                            </div>
 
-                            <div className="flex items-center gap-4 py-8 opacity-50">
-                                <div className="h-px bg-slate-300 flex-1"></div>
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('profile_strategy_section')}</span>
-                                <div className="h-px bg-slate-300 flex-1"></div>
-                            </div>
-
-                            {/* Section 3: Strategy */}
-                            <div className="relative group">
-                                <div className="absolute -left-12 top-8 text-slate-300 font-heading font-bold text-4xl opacity-0 xl:opacity-20 group-hover:opacity-100 transition-opacity">03</div>
-                                <GatedSection isPro={effectiveIsPro} title="Strategy & Conversion">
-                                    <StrategyConfig profile={profile} onChange={handleUpdate} />
+                                <GatedSection isPro={effectiveIsPro} title="Revenue & Ecosystem">
+                                    <StrategyConfig profile={activeProfile} onChange={handleUpdate} />
                                 </GatedSection>
-                            </div>
 
-                            {/* Section 4: Positioning */}
-                            <div className="relative group">
-                                <div className="absolute -left-12 top-8 text-slate-300 font-heading font-bold text-4xl opacity-0 xl:opacity-20 group-hover:opacity-100 transition-opacity">04</div>
-                                <GatedSection isPro={effectiveIsPro} title="Brand Positioning">
-                                    <PositioningInput profile={profile} onChange={handleUpdate} />
+                                <GatedSection isPro={effectiveIsPro} title="Market Positioning">
+                                    <PositioningInput profile={activeProfile} onChange={handleUpdate} />
                                 </GatedSection>
                             </div>
 
                         </div>
                     ) : (
-                        <div className="text-center py-20">
-                            <h2 className="text-xl font-bold text-slate-900 mb-2">{t('profile_empty_title')}</h2>
-                            <button onClick={() => router.push('/onboarding')} className="text-indigo-600 font-bold hover:underline">
-                                {t('profile_empty_btn')}
-                            </button>
+                        <div className="text-center py-40 space-y-8 bg-surface/40 backdrop-blur-xl rounded-[60px] border border-border">
+                            <img src="/logo.png" className="w-24 h-24 opacity-10 mx-auto animate-float" />
+                            <div className="space-y-3">
+                                <h2 className="text-2xl font-black tracking-tight text-foreground">No identities established.</h2>
+                                <p className="text-[10px] font-black text-muted uppercase tracking-[0.4em]">Multi-Identity Synchronization Inactive</p>
+                            </div>
+                            <Link href="/onboarding" className="inline-block px-12 py-5 bg-foreground text-background dark:bg-surface dark:text-foreground rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:opacity-90 shadow-bubble transition-all">Initialization Required</Link>
                         </div>
                     )}
                 </div>
 
-                {/* Floating Save Action (Premium Feel) */}
-                <div className="fixed bottom-8 right-8 lg:right-12 z-50">
-                    <button
-                        onClick={handleSave}
-                        disabled={saving || loading}
-                        className={`flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 rounded-full font-bold shadow-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed ${saving
-                            ? 'bg-emerald-500 text-white shadow-emerald-200'
-                            : strength === 100
-                                ? 'bg-indigo-600 text-white shadow-indigo-300'
-                                : 'bg-slate-900 text-white shadow-slate-400 hover:bg-slate-800'
-                            }`}
-                    >
-                        {saving ? (
-                            <>
-                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span>{t('profile_btn_syncing')}</span>
-                            </>
-                        ) : (
-                            <>
-                                <span>{t('profile_btn_save')}</span>
-                                <div className="w-px h-4 bg-white/20"></div>
-                                <span className="opacity-80 text-xs uppercase tracking-wider font-medium">{strength}% {t('studio_ready')}</span>
-                            </>
-                        )}
-                    </button>
-                </div>
+                {/* Floating Sync Control */}
+                {activeProfile && (
+                    <div className="fixed bottom-12 right-12 lg:right-24 z-50">
+                        <button
+                            onClick={handleSave}
+                            disabled={saving || saved}
+                            className={`flex items-center gap-6 p-6 px-14 rounded-[32px] font-black text-[13px] uppercase tracking-[0.4em] shadow-bubble backdrop-blur-xl transition-all hover:scale-105 active:scale-95 disabled:opacity-80 group
+                                ${saved
+                                    ? 'bg-green-500 text-white shadow-green-500/30 border border-green-400/50'
+                                    : saving
+                                        ? 'bg-surface text-primary border border-primary/20'
+                                        : 'bg-gradient-to-r from-primary to-secondary text-white shadow-primary/30 hover:shadow-primary/40'
+                                }
+                            `}
+                        >
+                            {saved ? (
+                                <Zap className="w-5 h-5 fill-current" strokeWidth={3} />
+                            ) : saving ? (
+                                <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                            ) : <Zap className="w-5 h-5 group-hover:scale-110 transition-transform" strokeWidth={3} />}
+
+                            {saved ? 'Identity Synchronized' : saving ? 'Transmitting Identity' : 'Sync Strategic Base'}
+                        </button>
+                    </div>
+                )}
             </main>
         </div>
     );
@@ -282,18 +250,18 @@ function GatedSection({ children, isPro, title }: { children: React.ReactNode, i
     if (isPro) return <>{children}</>;
 
     return (
-        <div className="relative group overflow-hidden rounded-3xl">
-            <div className="blur-[6px] pointer-events-none transition-all duration-500 opacity-60">
+        <div className="relative group overflow-hidden rounded-[60px] border border-border bg-surface/40 backdrop-blur-xl shadow-bubble transition-all duration-700 hover:border-primary/20">
+            <div className="blur-3xl pointer-events-none opacity-20 select-none grayscale p-20 scale-105">
                 {children}
             </div>
-            <div className="absolute inset-0 bg-white/40 flex flex-col items-center justify-center p-8 text-center z-10 animate-in fade-in zoom-in-95 duration-500">
-                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-200 mb-4">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2-2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-16 text-center z-10 animate-in fade-in duration-1000">
+                <div className="w-24 h-24 bg-surface border border-border rounded-[32px] flex items-center justify-center text-primary shadow-bubble mb-10 animate-float">
+                    <Lock className="w-10 h-10" strokeWidth={3} />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-1">{title}</h3>
-                <p className="text-xs text-slate-500 mb-6 max-w-[240px]">This strategy feature is reserved for users on the Authority Plan. Unlock it to build your brand faster.</p>
-                <Link href="/plans" className="bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-all shadow-lg hover:shadow-slate-100 active:scale-95">
-                    Unlock Authority Plan
+                <h3 className="text-3xl font-black tracking-tight text-foreground mb-4">Locked: <span className="text-primary">{title}</span></h3>
+                <p className="text-[11px] font-black text-muted uppercase tracking-[0.3em] mb-12 max-w-[400px] leading-relaxed">Authority synchronization required for high-level market frameworks.</p>
+                <Link href="/plans" className="px-14 py-6 bg-gradient-to-r from-primary to-secondary text-white rounded-full text-[12px] font-black uppercase tracking-[0.4em] hover:scale-110 active:scale-95 transition-all shadow-bubble shadow-primary/20">
+                    Unlock Elite Access
                 </Link>
             </div>
         </div>

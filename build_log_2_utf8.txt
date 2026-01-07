@@ -1,0 +1,55 @@
+﻿
+> my-app@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 16.3s
+  Running TypeScript ...
+node.exe : Failed to compile.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.e
+xe" "C:\Program Files\nodejs/node_m
+o ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~
+    + CategoryInfo          : NotS 
+   pecified: (Failed to compile.:  
+  String) [], RemoteException
+    + FullyQualifiedErrorId : Nati 
+   veCommandError
+ 
+
+.next/dev/types/validator.ts:80:39
+Type error: Cannot find module '../
+../../app/help/page.js' or its corr
+esponding type declarations.
+
+[0m [90m 78 |[39m {
+ [90m 79 |[39m   type __IsExpecte
+d[33m<[39m[33mSpecific[39m [36
+mextends[39m [33mAppPageConfig[3
+9m[33m<[39m[32m"/help"[39m[33m
+>>[39m [33m=[39m [33mSpecific[
+39m
+[31m[1m>[22m[39m[90m 80 |[39m
+   [36mconst[39m handler [33m=[
+39m {} [36mas[39m [36mtypeof[39
+m [36mimport[39m([32m"../../../a
+pp/help/page.js"[39m)
+ [90m    |[39m                   
+                    [31m[1m^[22m
+[39m
+ [90m 81 |[39m   type __Check [3
+3m=[39m __IsExpected[33m<[39m[3
+6mtypeof[39m handler[33m>[39m
+ [90m 82 |[39m   [90m// @ts-igno
+re[39m
+ [90m 83 |[39m   type __Unused [
+33m=[39m __Check[0m
+Next.js build worker exited with co
+de: 1 and signal: null
+

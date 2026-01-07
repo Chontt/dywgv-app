@@ -2,6 +2,7 @@
 
 import { BrandProfile } from "@/types/app";
 import { useI18n } from "@/lib/i18n";
+import { User } from "lucide-react";
 
 type IdentitySectionProps = {
     profile: BrandProfile;
@@ -13,63 +14,66 @@ export default function IdentitySection({ profile, onChange }: IdentitySectionPr
     const levels = ["beginner", "growing", "authority", "elite"];
 
     return (
-        <section className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
-            <h2 className="font-heading font-bold text-lg text-slate-900 mb-6 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">1</span>
-                {t('identity_foundation')}
-            </h2>
+        <section className="bg-surface/40 backdrop-blur-xl rounded-[48px] border border-border p-12 lg:p-16 shadow-bubble space-y-12 transition-all duration-700">
+            <header className="flex items-center gap-6 border-b border-border pb-10">
+                <div className="w-14 h-14 rounded-[24px] bg-primary/10 flex items-center justify-center text-primary shadow-inner transition-transform hover:scale-110">
+                    <User className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                    <h2 className="text-3xl font-black tracking-tight text-foreground">Identity <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Foundation</span></h2>
+                    <p className="text-[10px] font-black text-muted uppercase tracking-[0.4em]">Core Authority Synthesis</p>
+                </div>
+            </header>
 
-            <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-6">
                 {/* Brand Name */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-[0.5em] text-muted px-1 opacity-50">
                         {t('identity_name_label')}
                     </label>
                     <input
                         type="text"
                         value={profile.brand_name || ""}
                         onChange={(e) => onChange({ brand_name: e.target.value })}
-                        className="w-full text-lg font-bold text-slate-900 border-none bg-slate-50 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 placeholder-slate-300"
+                        className="w-full text-xl font-black tracking-tight text-foreground bg-background/50 border border-border rounded-[28px] px-10 py-6 focus:border-primary/50 focus:ring-8 focus:ring-primary/5 transition-all outline-none shadow-sm placeholder:text-muted/20"
                         placeholder={t('identity_name_placeholder')}
                     />
                 </div>
 
                 {/* Role */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-[0.5em] text-muted px-1 opacity-50">
                         {t('identity_role_label')}
                     </label>
                     <input
                         type="text"
                         value={profile.role || ""}
                         onChange={(e) => onChange({ role: e.target.value })}
-                        className="w-full font-medium text-slate-700 border-none bg-slate-50 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 placeholder-slate-300"
+                        className="w-full text-sm font-black text-foreground bg-background/50 border border-border rounded-[28px] px-10 py-6 focus:border-primary/50 focus:ring-8 focus:ring-primary/5 transition-all outline-none shadow-sm placeholder:text-muted/20"
                         placeholder={t('identity_role_placeholder')}
                     />
                 </div>
 
                 {/* Authority Level */}
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+                <div className="md:col-span-2 space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-[0.5em] text-muted px-1 opacity-50">
                         {t('identity_authority_label')}
                     </label>
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                         {levels.map((lvl) => (
                             <button
                                 key={lvl}
                                 onClick={() => onChange({ authority_level: lvl })}
-                                className={`px-2 py-3 rounded-xl border text-sm font-medium transition-all ${profile.authority_level === lvl
-                                    ? "border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-600"
-                                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+                                className={`px-8 py-6 rounded-[28px] border text-[10px] font-black uppercase tracking-[0.4em] transition-all duration-500 relative overflow-hidden group
+                                    ${profile.authority_level === lvl
+                                        ? "border-transparent bg-gradient-to-br from-primary to-secondary text-white shadow-bubble shadow-primary/20"
+                                        : "border-border bg-background/50 text-muted hover:border-primary/30"
                                     }`}
                             >
-                                {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+                                <span className="relative z-10">{lvl}</span>
                             </button>
                         ))}
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-2 text-right">
-                        {t('identity_authority_hint')}
-                    </p>
                 </div>
             </div>
         </section>

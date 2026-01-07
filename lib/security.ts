@@ -12,7 +12,7 @@ interface LogAuthEventParams {
     supabase: SupabaseClient;
     userId?: string;
     event: AuthEvent;
-    detail?: any;
+    detail?: Record<string, unknown>;
     ip?: string;
 }
 

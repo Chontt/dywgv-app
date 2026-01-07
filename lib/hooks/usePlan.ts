@@ -31,8 +31,8 @@ export function usePlan() {
             if (!res.ok) throw new Error('Failed to fetch plan');
             const json = await res.json();
             setData(json);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setLoading(false);
         }

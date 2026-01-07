@@ -1,53 +1,52 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
-import { createClient } from '@supabase/supabase-js';
-
-// We need a server-side Supabase client to verify the user
-// Since we are in an API route, we can use the standard createClient if we had the service role, 
-// OR simpler: just verify the JWT from the request headers if we were using middleware.
-// However, for simplicity in this flow, we'll trust the client sends the user ID or use a proper auth helper.
-// BETTER: Use @supabase/ssr or just a standard headers check if we want to be secure.
-// For now, let's assume we pass the user ID from the client (NOT SECURE for production but fine for MVP demo)
-// OR better: use the `Authorization` header to get the user.
+import { createClient } from '@/lib/supabaseServer';
+import { stripe, getOrCreateStripeCustomer, resolveStripePriceId } from '@/lib/stripe';
 
 export async function POST(req: Request) {
     try {
-        const { priceId, userId, email, billingCycle } = await req.json();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
-        if (!stripe) {
-            return NextResponse.json(
-                { error: 'Stripe is not configured. STRIPE_SECRET_KEY is missing.' },
-                { status: 500 }
-            );
+        if (!user) {
+            return new NextResponse('Unauthorized', { status: 401 });
         }
 
-        // In a real app, verify the user session here to ensure 'userId' matches the authenticated user.
-        // For this implementation, we proceed to create the session.
+        const body = await req.json();
+        const { interval, locale } = body;
 
-        const origin = req.headers.get('origin') || 'http://localhost:3000';
+        // Use the robust resolver (locale acts as market signal)
+        const priceId = resolveStripePriceId(interval, locale);
 
-        // Create Checkout Session
+        if (!priceId) {
+            return new NextResponse('Price ID not found for this region/interval', { status: 400 });
+        }
+
+        const customerId = await getOrCreateStripeCustomer(user.email || '', user.id, supabase);
+
+        // Dynamic Base URL (support Localhost vs Production automatically)
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
         const session = await stripe.checkout.sessions.create({
+            customer: customerId,
             mode: 'subscription',
             payment_method_types: ['card'],
             line_items: [
                 {
-                    price: priceId, // This must be a real Stripe Price ID (e.g., price_H5ggYJ...)
+                    price: priceId,
                     quantity: 1,
                 },
             ],
-            customer_email: email, // Pre-fill email
+            success_url: `${appUrl}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${appUrl}/plans?checkout=canceled`,
             metadata: {
-                userId: userId, // Pass userId to webhook
+                userId: user.id,
+                market: locale || 'en', // Track which market they originated from
             },
-            success_url: `${origin}/dashboard?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${origin}/plans?payment=cancelled`,
-            allow_promotion_codes: true,
         });
 
-        return NextResponse.json({ sessionId: session.id, url: session.url });
-    } catch (err: any) {
-        console.error('Stripe Checkout Error:', err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return NextResponse.json({ url: session.url });
+    } catch (error: any) {
+        console.error('Stripe Checkout Error:', error);
+        return new NextResponse('Internal Error', { status: 500 });
     }
 }

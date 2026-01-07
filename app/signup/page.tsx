@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Shield } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { validatePasswordSecurity } from "@/app/actions/security";
 
@@ -67,93 +68,104 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50/80 via-white to-pastel-lavender/30 flex items-center justify-center px-4 font-sans">
-      <div className="w-full max-w-md relative">
-        {/* Abstract Background Shapes */}
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-pink-200/40 rounded-full blur-3xl animate-blob"></div>
-        <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-indigo-200/40 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+    <main className="min-h-screen bg-background flex items-center justify-center px-4 font-sans relative overflow-hidden selection:bg-primary/30 transition-colors duration-700">
+      {/* Decorative Blobs */}
+      <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-primary/5 blur-[150px] rounded-full -ml-96 -mt-96 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-secondary/5 blur-[150px] rounded-full -mr-96 -mb-96 pointer-events-none" />
 
-        <div className="relative bg-white/40 backdrop-blur-xl border border-white/60 shadow-glass rounded-3xl p-8 overflow-hidden">
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400"></div>
+      <div className="w-full max-w-[500px] relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="bg-surface/40 backdrop-blur-2xl rounded-[64px] border border-surface p-16 shadow-bubble overflow-hidden group">
+          <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
 
-          <div className="text-center mb-8">
-            <h1 className="font-heading text-2xl font-bold text-slate-900">
-              {t('auth_signup_title')}
+          <div className="text-center mb-12">
+            <div className="w-20 h-20 bg-surface rounded-[32px] mx-auto mb-8 flex items-center justify-center shadow-bubble group-hover:scale-110 transition-transform duration-700">
+              <Shield className="w-8 h-8 text-primary opacity-80" fill="currentColor" />
+            </div>
+            <h1 className="text-4xl font-black tracking-tighter text-foreground">
+              {t('auth_signup_title')} <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Gate</span>
             </h1>
-            <p className="text-slate-500 mt-2 text-sm">
-              {t('auth_signup_subtitle')}
+            <p className="text-muted mt-4 text-xs font-black uppercase tracking-[0.5em]">
+              {t('auth_signup_subtitle') || "Establish Your Authority Domain"}
             </p>
           </div>
 
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div>
-              <label htmlFor="username" className="block text-xs font-semibold text-slate-700 mb-1.5 ml-1">
+          <form onSubmit={handleSignup} className="space-y-8">
+            <div className="space-y-3">
+              <label htmlFor="username" className="block text-xs font-black uppercase tracking-[0.5em] text-muted ml-4">
                 {t('auth_username')}
               </label>
               <input
                 id="username"
-                className="w-full rounded-xl border-0 bg-white/50 px-4 py-3 text-sm shadow-sm ring-1 ring-slate-200 transition-all placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-indigo-500"
+                required
+                className="w-full rounded-full border border-border bg-surface px-10 py-6 text-sm font-bold text-foreground shadow-sm transition-all placeholder:text-muted/50 focus:bg-surface focus:border-primary/50 focus:ring-8 focus:ring-primary/5 outline-none"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="e.g. creative_mind"
+                placeholder="e.g. creative_executive"
               />
             </div>
 
-            <div>
-              <label htmlFor="email" className="block text-xs font-semibold text-slate-700 mb-1.5 ml-1">
+            <div className="space-y-3">
+              <label htmlFor="email" className="block text-xs font-black uppercase tracking-[0.5em] text-muted ml-4">
                 {t('auth_email')}
               </label>
               <input
                 id="email"
                 type="email"
-                className="w-full rounded-xl border-0 bg-white/50 px-4 py-3 text-sm shadow-sm ring-1 ring-slate-200 transition-all placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-indigo-500"
+                required
+                className="w-full rounded-full border border-border bg-surface px-10 py-6 text-sm font-bold text-foreground shadow-sm transition-all placeholder:text-muted/50 focus:bg-surface focus:border-primary/50 focus:ring-8 focus:ring-primary/5 outline-none"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder="you@domain.com"
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-xs font-semibold text-slate-700 mb-1.5 ml-1">
+            <div className="space-y-3">
+              <label htmlFor="password" className="block text-xs font-black uppercase tracking-[0.5em] text-muted ml-4">
                 {t('auth_password')}
               </label>
               <input
                 id="password"
                 type="password"
-                className="w-full rounded-xl border-0 bg-white/50 px-4 py-3 text-sm shadow-sm ring-1 ring-slate-200 transition-all placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-indigo-500"
+                required
+                className="w-full rounded-full border border-border bg-surface px-10 py-6 text-sm font-bold text-foreground shadow-sm transition-all placeholder:text-muted/50 focus:bg-surface focus:border-primary/50 focus:ring-8 focus:ring-primary/5 outline-none"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Min 8 chars"
+                placeholder="Secure access key"
               />
-              <p className="text-[10px] text-slate-400 mt-1 ml-1">
+              <p className="text-xs font-black uppercase tracking-widest text-muted mt-3 ml-4 opacity-60">
                 {t('auth_hibp_note')}
               </p>
             </div>
 
             {error && (
-              <div className="rounded-xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-xs font-medium text-rose-700 animate-pulse">
-                ⚠️ {error}
+              <div className="rounded-[24px] border border-red-500/10 bg-red-500/5 px-8 py-5 text-xs font-black uppercase tracking-widest text-red-500 animate-pulse text-center">
+                {error}
               </div>
             )}
             {message && (
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50/90 px-4 py-3 text-xs font-medium text-emerald-700 shadow-sm">
-                ✅ {message}
+              <div className="rounded-[24px] border border-emerald-500/10 bg-emerald-500/5 px-8 py-5 text-xs font-black uppercase tracking-widest text-emerald-500 text-center">
+                {message}
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-slate-900 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition-all hover:bg-slate-800 hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0"
+              className="w-full rounded-full bg-gradient-to-r from-primary to-secondary px-4 py-6 text-sm font-black uppercase tracking-[0.4em] text-white shadow-bubble shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
             >
-              {loading ? t('auth_submitting_signup') : t('auth_submit_signup')}
+              {loading ? (
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-3 h-3 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                  {t('auth_submitting_signup')}
+                </div>
+              ) : t('auth_submit_signup')}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-slate-500">
+          <div className="mt-12 text-center">
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-muted">
               {t('auth_has_account')}{" "}
-              <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline transition-colors">
+              <Link href="/login" className="text-primary hover:text-secondary transition-colors ml-2">
                 {t('auth_link_login')}
               </Link>
             </p>
